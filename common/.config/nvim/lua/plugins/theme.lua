@@ -1,0 +1,1 @@
+/home/salem/.config/omarchy/current/theme/neovim.lua
