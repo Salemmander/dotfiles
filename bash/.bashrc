@@ -22,3 +22,7 @@ unset __conda_setup
 # <<< conda initialize <<<
 
 alias c='clear'
+alias cs='c;ls'
+alias csa='c;lsa'
+alias ct='c;lt'
+alias cta='c;lta'
