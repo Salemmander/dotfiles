@@ -13,10 +13,6 @@ bindkey '^[[B' history-substring-search-down
 # Command Syntax highlighting 
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-# Source machine-specific and private env vars
-if [ -f ~/.zshrc.local ]; then
-  source ~/.zshrc.local
-fi
 
 export EDITOR=nvim
 
@@ -32,6 +28,11 @@ alias cta='c;lta'
 alias ct='c;lt'
 
 autoload -U +X bashcompinit && bashcompinit
+
+# Source machine-specific and private env vars
+if [ -f ~/.zshrc.local ]; then
+  source ~/.zshrc.local
+fi
 
 eval "$(zoxide init --cmd cd zsh)"
 eval "$(starship init zsh)"
