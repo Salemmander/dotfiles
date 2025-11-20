@@ -1,7 +1,7 @@
 command_timeout = 600
 
 add_newline = true
-format = "$conda$python$username$hostname[$directory$git_branch$git_status]($style)$line_break$character"
+format = "$conda$python$hostname[$directory$git_branch$git_status]($style)$line_break$character"
 
 [character]
 error_symbol = "[✗](bold cyan)"
@@ -42,14 +42,8 @@ ignore_base = true
 format = '([\($virtualenv\)]($style) )'
 style = "yellow bold"
 
-[username]
-style_user = "bold blue"
-style_root = "bold red"
-format = "[$user]@"
-show_always = false
-
 [hostname]
 ssh_only = true
-style = "bold blue"
-format = "[$hostname] "
+style = "white bold"
+format = "[$hostname]($style) "
 trim_at = "."
