@@ -49,7 +49,7 @@ format = "[$user]@"
 show_always = false
 
 [hostname]
+ssh_only = true
 style = "bold blue"
 format = "[$hostname] "
 trim_at = "."
-ssh_only = true
