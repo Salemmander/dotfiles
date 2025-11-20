@@ -52,4 +52,4 @@ show_always = false
 style = "bold blue"
 format = "[$hostname] "
 trim_at = "."
-disabled = false
+ssh_only = true
