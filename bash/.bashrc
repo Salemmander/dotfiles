@@ -26,5 +26,6 @@ alias cs='c;ls'
 alias csa='c;lsa'
 alias ct='c;lt'
 alias cta='c;lta'
+alias lt='eza --tree --group-directories-first --level=2 --long --icons --git'
 
 eval "$(starship init bash)"
