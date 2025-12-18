@@ -27,6 +27,16 @@ alias cs='c;ls'
 alias cta='c;lta'
 alias ct='c;lt'
 
+oc() {
+    if [[ "$1" == "logout" ]]; then
+        # Run the actual logout command first
+        command oc "$@" && command oc config unset current-context
+    else
+        # Pass all other commands through to the real binary
+        command oc "$@"
+    fi
+}
+
 autoload -U +X bashcompinit && bashcompinit
 
 # Source machine-specific and private env vars

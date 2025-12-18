@@ -1,7 +1,7 @@
 command_timeout = 600
 
 add_newline = true
-format = "$conda$python$hostname[$directory$git_branch$git_status]($style)$line_break$character"
+format = "$conda$python[$directory$git_branch$git_status$kubernetes]($style)$line_break$character"
 
 [character]
 error_symbol = "[✗](bold cyan)"
@@ -47,3 +47,9 @@ ssh_only = true
 style = "white bold"
 format = "[$hostname]($style) "
 trim_at = "."
+
+[kubernetes]
+symbol = "☸ "
+style = "cyan"
+format = '[$symbol$namespace]($style)'
+disabled = false
