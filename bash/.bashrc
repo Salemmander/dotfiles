@@ -1,6 +1,10 @@
 # If not running interactively, don't do anything (leave this at the top of this file)
 [[ $- != *i* ]] && return
 
+# ble.sh - syntax highlighting, autosuggestions, etc.
+[[ -f /usr/share/blesh/ble.sh ]] && source /usr/share/blesh/ble.sh --noattach
+ble-face auto_complete='fg=8'
+
 # All the default Omarchy aliases and functions
 # (don't mess with these directly, just overwrite them here!)
 [[ -f ~/.local/share/omarchy/default/bash/rc ]] && source ~/.local/share/omarchy/default/bash/rc
@@ -29,3 +33,6 @@ alias cta='c;lta'
 alias lt='eza --tree --group-directories-first --level=2 --long --icons --git'
 
 eval "$(starship init bash)"
+
+# Attach ble.sh (must be at the end)
+[[ ${BLE_VERSION-} ]] && ble-attach
