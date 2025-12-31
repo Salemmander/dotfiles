@@ -1,9 +1,33 @@
 # If not running interactively, don't do anything (leave this at the top of this file)
 [[ $- != *i* ]] && return
 
+export PATH="$HOME/.local/bin:$PATH"
+
 # ble.sh - syntax highlighting, autosuggestions, etc.
 [[ -f /usr/share/blesh/ble.sh ]] && source /usr/share/blesh/ble.sh --noattach
 ble-face auto_complete='fg=8'
+ble-face region_match=''
+
+# Command highlighting like zsh-syntax-highlighting (green = valid, red = invalid)
+ble-face syntax_command='fg=green'
+ble-face command_builtin='fg=green'
+ble-face command_builtin_dot='fg=green'
+ble-face command_alias='fg=green'
+ble-face command_function='fg=green'
+ble-face syntax_error='fg=red'
+
+ble-face syntax_tilde='fg=252'
+ble-face filename_directory='fg=252'
+ble-face filename_executable='fg=252'
+ble-face filename_link='fg=252'
+ble-face filename_orphan='fg=252'
+ble-face filename_other='fg=252'
+ble-face filename_setuid='fg=252'
+ble-face filename_setgid='fg=252'
+
+# History search like zsh-history-substring-search (no info line, substring match)
+ble-bind -f up   'history-search-backward hide-status:immediate-accept:substr'
+ble-bind -f down 'history-search-forward hide-status:immediate-accept:substr'
 
 # All the default Omarchy aliases and functions
 # (don't mess with these directly, just overwrite them here!)
