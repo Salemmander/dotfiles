@@ -15,6 +15,20 @@ stow -D -t ~ <package>
 stow -n -v -t ~ <package>
 ```
 
+## Quick Install
+
+Install scripts automate dependency installation for each platform:
+
+```bash
+# Arch Linux
+./install-arch.sh
+
+# macOS
+./install-mac.sh
+```
+
+Then deploy configs with stow (see per-package instructions below).
+
 ---
 
 ## common/
