@@ -60,3 +60,5 @@ eval "$(starship init bash)"
 
 # Attach ble.sh (must be at the end)
 [[ ${BLE_VERSION-} ]] && ble-attach
+
+. "$HOME/.local/share/../bin/env"
