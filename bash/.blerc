@@ -4,7 +4,6 @@
 bleopt exec_exit_mark=
 bleopt exec_errexit_mark=
 bleopt exec_elapsed_mark=
-bleopt attach_greeting=
 
 # Appearance
 ble-face auto_complete='fg=8'
