@@ -4,30 +4,37 @@
 export PATH="$HOME/.local/bin:$PATH"
 
 # ble.sh - syntax highlighting, autosuggestions, etc.
-[[ -f /usr/share/blesh/ble.sh ]] && source /usr/share/blesh/ble.sh --noattach
-ble-face auto_complete='fg=8'
-ble-face region_match=''
+if [[ -f /usr/share/blesh/ble.sh ]]; then
+    source /usr/share/blesh/ble.sh --noattach
+elif [[ -f ~/.local/share/blesh/ble.sh ]]; then
+    source ~/.local/share/blesh/ble.sh --noattach
+fi
 
-# Command highlighting like zsh-syntax-highlighting (green = valid, red = invalid)
-ble-face syntax_command='fg=green'
-ble-face command_builtin='fg=green'
-ble-face command_builtin_dot='fg=green'
-ble-face command_alias='fg=green'
-ble-face command_function='fg=green'
-ble-face syntax_error='fg=red'
+if [[ ${BLE_VERSION-} ]]; then
+    ble-face auto_complete='fg=8'
+    ble-face region_match=''
 
-ble-face syntax_tilde='fg=252'
-ble-face filename_directory='fg=252'
-ble-face filename_executable='fg=252'
-ble-face filename_link='fg=252'
-ble-face filename_orphan='fg=252'
-ble-face filename_other='fg=252'
-ble-face filename_setuid='fg=252'
-ble-face filename_setgid='fg=252'
+    # Command highlighting like zsh-syntax-highlighting (green = valid, red = invalid)
+    ble-face syntax_command='fg=green'
+    ble-face command_builtin='fg=green'
+    ble-face command_builtin_dot='fg=green'
+    ble-face command_alias='fg=green'
+    ble-face command_function='fg=green'
+    ble-face syntax_error='fg=red'
 
-# History search like zsh-history-substring-search (no info line, substring match)
-ble-bind -f up   'history-search-backward hide-status:immediate-accept:substr'
-ble-bind -f down 'history-search-forward hide-status:immediate-accept:substr'
+    ble-face syntax_tilde='fg=252'
+    ble-face filename_directory='fg=252'
+    ble-face filename_executable='fg=252'
+    ble-face filename_link='fg=252'
+    ble-face filename_orphan='fg=252'
+    ble-face filename_other='fg=252'
+    ble-face filename_setuid='fg=252'
+    ble-face filename_setgid='fg=252'
+
+    # History search like zsh-history-substring-search (no info line, substring match)
+    ble-bind -f up   'history-search-backward hide-status:immediate-accept:substr'
+    ble-bind -f down 'history-search-forward hide-status:immediate-accept:substr'
+fi
 
 # All the default Omarchy aliases and functions
 # (don't mess with these directly, just overwrite them here!)
@@ -61,4 +68,5 @@ eval "$(starship init bash)"
 # Attach ble.sh (must be at the end)
 [[ ${BLE_VERSION-} ]] && ble-attach
 
-. "$HOME/.local/share/../bin/env"
+# Source local env if it exists
+[[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
