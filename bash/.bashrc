@@ -36,9 +36,12 @@ if [[ ${BLE_VERSION-} ]]; then
     ble-bind -f down 'history-search-forward hide-status:immediate-accept:substr'
 fi
 
-# All the default Omarchy aliases and functions
-# (don't mess with these directly, just overwrite them here!)
-[[ -f ~/.local/share/omarchy/default/bash/rc ]] && source ~/.local/share/omarchy/default/bash/rc
+# Aliases - use omarchy if available, otherwise use dotfiles version
+if [[ -f ~/.local/share/omarchy/default/bash/rc ]]; then
+    source ~/.local/share/omarchy/default/bash/rc
+elif [[ -f ~/.bash_aliases ]]; then
+    source ~/.bash_aliases
+fi
 
 
 # >>> conda initialize >>>
