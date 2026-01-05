@@ -23,6 +23,9 @@ Install scripts automate dependency installation for each platform:
 # Arch Linux
 ./install-arch.sh
 
+# Ubuntu
+./install-ubuntu.sh
+
 # macOS
 ./install-mac.sh
 ```

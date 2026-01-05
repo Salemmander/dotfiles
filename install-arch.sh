@@ -22,16 +22,21 @@ else
     git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 fi
 
-# ble.sh instructions
+# ble.sh (from AUR)
 echo
-echo "=== ble.sh Installation ==="
-echo "ble.sh provides syntax highlighting and autosuggestions for bash."
-echo "Install via AUR:"
-echo "  yay -S blesh-git"
-echo
-echo "Or from source:"
-echo "  git clone --recursive --depth 1 --shallow-submodules https://github.com/akinomyoga/ble.sh.git"
-echo "  make -C ble.sh install PREFIX=~/.local"
+echo "Installing ble.sh..."
+if command -v ble &> /dev/null || [ -f ~/.local/share/blesh/ble.sh ]; then
+    echo "ble.sh already installed, skipping..."
+else
+    if command -v yay &> /dev/null; then
+        yay -S --needed blesh-git
+    elif command -v paru &> /dev/null; then
+        paru -S --needed blesh-git
+    else
+        echo "WARNING: No AUR helper (yay/paru) found. Install blesh-git manually:"
+        echo "  yay -S blesh-git"
+    fi
+fi
 
 # Verify neovim version
 echo
