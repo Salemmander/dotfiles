@@ -44,6 +44,7 @@ alias cta='c;lta'
 alias lt='eza --tree --group-directories-first --level=2 --long --icons --git'
 
 eval "$(starship init bash)"
+command -v zoxide &> /dev/null && eval "$(zoxide init bash)"
 
 # Attach ble.sh (must be at the end)
 [[ ${BLE_VERSION-} ]] && ble-attach
