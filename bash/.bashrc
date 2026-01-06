@@ -16,6 +16,8 @@ if [[ -f ~/.local/share/omarchy/default/bash/rc ]]; then
     source ~/.local/share/omarchy/default/bash/rc
 elif [[ -f ~/.bash_aliases ]]; then
     source ~/.bash_aliases
+elif [[ -f ~/.bash_secrets ]]; then
+    source ~/.bash_secrets
 fi
 
 
