@@ -36,7 +36,9 @@ if [ -f ~/.zshrc.local ]; then
   source ~/.zshrc.local
 fi
 
-eval "$(zoxide init --cmd cd zsh)"
+ if [[ -o interactive ]]; then
+    eval "$(zoxide init --cmd cd zsh)"
+  fi
 eval "$(starship init zsh)"
 
 
