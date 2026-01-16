@@ -11,14 +11,10 @@ elif [[ -f ~/.local/share/blesh/ble.sh ]]; then
     source ~/.local/share/blesh/ble.sh --noattach
 fi
 
-# Aliases - use omarchy if available, otherwise use dotfiles version
-if [[ -f ~/.local/share/omarchy/default/bash/rc ]]; then
-    source ~/.local/share/omarchy/default/bash/rc
-elif [[ -f ~/.bash_aliases ]]; then
-    source ~/.bash_aliases
-elif [[ -f ~/.bash_secrets ]]; then
-    source ~/.bash_secrets
-fi
+# Aliases - load omarchy if available, then user aliases
+[[ -f ~/.local/share/omarchy/default/bash/rc ]] && source ~/.local/share/omarchy/default/bash/rc
+[[ -f ~/.bash_aliases ]] && source ~/.bash_aliases
+[[ -f ~/.bash_secrets ]] && source ~/.bash_secrets
 
 
 # >>> conda initialize >>>
