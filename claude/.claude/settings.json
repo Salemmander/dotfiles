@@ -1,4 +1,16 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(git log:*)",
+      "Bash(git -C:*)",
+      "Bash(git branch:*)",
+      "Bash(git stash list:*)",
+      "Bash(fd:*)",
+      "Bash(find:*)",
+      "Bash(date:*)"
+    ],
+    "defaultMode": "default"
+  },
   "model": "opus",
   "statusLine": {
     "type": "command",
