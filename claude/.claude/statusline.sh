@@ -22,8 +22,25 @@ if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
 
     # Git status (cyan)
     st=''
+
+    # Ahead/behind
+    ahead=$(git rev-list --count @{u}..HEAD 2>/dev/null)
+    behind=$(git rev-list --count HEAD..@{u} 2>/dev/null)
+    [ -n "$ahead" ] && [ "$ahead" -gt 0 ] && st="${st}⇡${ahead} "
+    [ -n "$behind" ] && [ "$behind" -gt 0 ] && st="${st}⇣${behind} "
+
+    # Untracked files
     [ -n "$(git ls-files --others --exclude-standard 2>/dev/null)" ] && st="${st}? "
+
+    # Modified files (unstaged)
     git diff --quiet 2>/dev/null || st="${st} "
+
+    # Staged files
+    git diff --cached --quiet 2>/dev/null || st="${st} "
+
+    # Clean status (if nothing else)
+    [ -z "$st" ] && st=" "
+
     [ -n "$st" ] && printf '\033[36m%s\033[0m' "$st"
 else
     # Outside git repo: truncate to last 3 dirs with …/ prefix
