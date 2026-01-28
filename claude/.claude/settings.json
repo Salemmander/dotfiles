@@ -1,15 +1,22 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git log:*)",
-      "Bash(git -C * log:*)",
-      "Bash(git -C * branch:*)",
-      "Bash(git -C * stash list:*)",
-      "Bash(git branch:*)",
-      "Bash(git stash list:*)",
-      "Bash(fd:*)",
-      "Bash(find:*)",
-      "Bash(date:*)"
+      "Read",
+      "Glob",
+      "Grep",
+      "WebFetch",
+      "WebSearch",
+      "Bash(git *)",
+      "Bash(date *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(which *)",
+      "Bash(echo *)"
+    ],
+    "deny": [
+      "Bash(git*push*)",
+      "Bash(git*reset --hard*)",
+      "Bash(git*clean -f*)"
     ],
     "defaultMode": "default"
   },
@@ -20,5 +27,18 @@
   },
   "enabledPlugins": {
     "clangd-lsp@claude-plugins-official": true
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/format-hook.sh"
+          }
+        ]
+      }
+    ]
   }
 }
