@@ -13,7 +13,7 @@
       "Bash(which *)",
       "Bash(echo *)"
     ],
-    "deny": [
+    "ask": [
       "Bash(git*push*)",
       "Bash(git*reset --hard*)",
       "Bash(git*clean -f*)"
