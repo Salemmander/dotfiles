@@ -1,6 +1,8 @@
 autoload -Uz compinit
 compinit
 
+export PATH="$HOME/.local/share/nvim/mason/bin:$HOME/.local/bin:$PATH"
+
 # Autosuggestions
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 

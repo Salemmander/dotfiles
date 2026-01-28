@@ -1,7 +1,7 @@
 # If not running interactively, don't do anything (leave this at the top of this file)
 [[ $- != *i* ]] && return
 
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/share/nvim/mason/bin:$HOME/.local/bin:$PATH"
 
 # ble.sh - syntax highlighting, autosuggestions, etc.
 # Config is in ~/.blerc (loaded automatically by ble.sh)
