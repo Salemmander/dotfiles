@@ -56,6 +56,10 @@ case "$file_path" in
 *.toml)
 	command -v taplo &>/dev/null && taplo fmt "$file_path"
 	;;
+*.c | *.h | *.cpp | *.hpp | *.cc | *.cxx)
+	# LazyVim uses clangd LSP with --fallback-style=llvm
+	command -v clang-format &>/dev/null && clang-format -i --fallback-style=llvm "$file_path"
+	;;
 esac
 
 exit 0
