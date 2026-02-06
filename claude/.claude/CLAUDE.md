@@ -11,7 +11,8 @@
 - Data lives at `~/.task/taskchampion.sqlite3`
 - IMPORTANT: Always run `task next` at the start of every conversation and present a brief summary grouped by priority (H/M/L) with task descriptions
 - When user mentions work to do, add it with `task add`. If priority, tag, or project isn't clear from context, use AskUserQuestion to confirm before adding
-- When work is completed, mark it with `task <id> done`
+- When work is completed together in a session, mark it done with `task <id> done`. Otherwise ask/wait for user to confirm
+- Keep task descriptions short (a few words)
 - Conventions:
   - project: = repo name (e.g., project:auth-service). Leave blank if task doesn't belong to a specific repo
   - Tags: +bug, +feature, +chore (pick one per task), +blocked (when waiting on someone/something)
