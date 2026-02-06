@@ -1,0 +1,49 @@
+# [Created by task 3.4.2 2/6/2026 15:38:50]
+data.location=/Users/nasa68p/.task
+news.version=3.4.2
+
+# To use the default location of the XDG directories,
+# move this configuration file from ~/.taskrc to ~/.config/task/taskrc and update location config as follows:
+
+#data.location=~/.local/share/task
+#hooks.location=~/.config/task/hooks
+
+color=on
+
+# Custom colors matched to Ghostty/Bamboo terminal palette
+# Uses ANSI names so terminal palette colors apply automatically
+
+# Header and labels
+color.header=bold
+color.footnote=white
+color.label=white
+color.label.sort=white
+
+# Alternating rows for readability
+color.alternate=
+
+# Priority
+color.uda.priority.H=bold red
+color.uda.priority.M=bold yellow
+color.uda.priority.L=white
+
+# Project
+color.project.none=
+
+# Tags
+color.tagged=
+color.tag.none=
+
+# Due dates
+color.due=green
+color.due.today=bold yellow
+color.overdue=bold red
+
+# Active and blocked
+color.active=bold cyan
+color.blocked=bold black
+color.blocking=bold magenta
+
+# Task states
+color.completed=bold black
+color.deleted=bold black
