@@ -9,7 +9,7 @@
 
 - User uses **Taskwarrior** (v3, SQLite-backed) for todo tracking
 - Data lives at `~/.task/taskchampion.sqlite3`
-- IMPORTANT: Always run `task next` at the start of every conversation to check pending tasks
+- IMPORTANT: Always run `task next` at the start of every conversation and present a brief summary grouped by priority (H/M/L) with task descriptions
 - When user mentions work to do, add it with `task add`. If priority, tag, or project isn't clear from context, use AskUserQuestion to confirm before adding
 - When work is completed, mark it with `task <id> done`
 - Conventions:
