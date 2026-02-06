@@ -11,7 +11,13 @@
       "Bash(ls *)",
       "Bash(cat *)",
       "Bash(which *)",
-      "Bash(echo *)"
+      "Bash(echo *)",
+      "Bash(task next*)",
+      "Bash(task list*)",
+      "Bash(task show*)",
+      "Bash(task * info)",
+      "Bash(task add *)",
+      "Bash(task * modify *)"
     ],
     "ask": [
       "Bash(git*push*)",
