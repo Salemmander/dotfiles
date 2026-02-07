@@ -1,5 +1,5 @@
 # [Created by task 3.4.2 2/6/2026 15:38:50]
-data.location=/Users/nasa68p/.task
+data.location=~/.task
 news.version=3.4.2
 
 # To use the default location of the XDG directories,
