@@ -45,5 +45,5 @@ color.blocked=bold black
 color.blocking=bold magenta
 
 # Task states
-color.completed=bold black
+color.completed=gray10
 color.deleted=bold black

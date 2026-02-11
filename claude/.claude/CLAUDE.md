@@ -1,9 +1,12 @@
+@~/.claude/local.md
+
 # User Preferences
 
 - Never include the Claude Code reference or Co-Authored-By line in commit messages
 - Never use emojis in any files
 - Avoid using `cd` to change directories in bash commands. Trust the current working directory and run commands directly (e.g., use `git status` not `git -C /path status` when already in the repo).
 - Always place imports at the top of the file, never inside functions or methods
+- A linter runs after every edit and strips unused imports. When changing imports, always include the consuming code in the **same `Edit` call** so the new imports are never momentarily unused. You do NOT need to rewrite the whole file -- just ensure each individual edit leaves all imports in a used state
 
 # Task Management
 
