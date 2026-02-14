@@ -1,11 +1,17 @@
 @~/.claude/local.md
 
+# Self-Correction
+
+- When the user corrects a repetitive behavior or pattern mistake, use the AskUserQuestion tool with a yes/no to ask if they want the rule added to this CLAUDE.md file so it persists across all future conversations.
+
 # User Preferences
 
 - Never include the Claude Code reference or Co-Authored-By line in commit messages
 - Never use emojis in any files
 - Avoid using `cd` to change directories in bash commands. Trust the current working directory and run commands directly (e.g., use `git status` not `git -C /path status` when already in the repo).
 - Always place imports at the top of the file, never inside functions or methods
+
+<<<<<<< Updated upstream
 
 ## Linter: Unused Import Stripping (CRITICAL)
 
@@ -14,7 +20,13 @@ A linter runs after every edit and **immediately deletes** any import that isn't
 - **NEVER edit imports in a separate Edit call from the code that uses them.** The linter will delete the new imports before your next edit even runs.
 - Always include both the import change AND the consuming code change in a **single Edit call**.
 - If you need to change a base class, rename a function, or swap a library -- do the import + usage in one shot.
-- You do NOT need to rewrite the whole file -- just make sure each individual Edit leaves all imports in a used state.
+
+- # You do NOT need to rewrite the whole file -- just make sure each individual Edit leaves all imports in a used state
+
+# Code Editing Rules
+
+- A `ruff check --fix` post-edit hook auto-removes unused imports. When adding a new import, always include it in the **same edit** as the code that uses it. Never add an import in one edit and the usage in a separate edit -- ruff will strip it in between. If the import and usage are in different parts of the file, make a single larger edit covering both.
+  > > > > > > > Stashed changes
 
 # Task Management
 
