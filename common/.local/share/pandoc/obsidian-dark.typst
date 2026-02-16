@@ -1,0 +1,203 @@
+// Obsidian-style dark mode template for pandoc -> typst -> PDF
+// Usage: pandoc -d pdf input.md -o output.pdf
+
+#let colors = (
+  bg: rgb("#1e1e1e"),
+  text: rgb("#dcddde"),
+  heading: rgb("#e8e8e8"),
+  muted: rgb("#999999"),
+  accent: rgb("#7f6df2"),
+  link: rgb("#7f6df2"),
+  code-bg: rgb("#2d2d2d"),
+  code-text: rgb("#d4d4d4"),
+  inline-code-bg: rgb("#2d2d2d"),
+  quote-border: rgb("#7f6df2"),
+  quote-text: rgb("#999999"),
+  table-border: rgb("#3e3e3e"),
+  table-alt-row: rgb("#252525"),
+  hr: rgb("#3e3e3e"),
+)
+
+#let content-to-string(content) = {
+  if content.has("text") {
+    content.text
+  } else if content.has("children") {
+    content.children.map(content-to-string).join("")
+  } else if content.has("body") {
+    content-to-string(content.body)
+  } else if content == [ ] {
+    " "
+  }
+}
+
+#let conf(
+  title: none,
+  subtitle: none,
+  authors: (),
+  keywords: (),
+  date: none,
+  abstract-title: none,
+  abstract: none,
+  thanks: none,
+  cols: 1,
+  margin: (x: 0.6in, y: 0.6in),
+  paper: "us-letter",
+  lang: "en",
+  region: "US",
+  font: ("Helvetica Neue",),
+  fontsize: 11pt,
+  mathfont: none,
+  codefont: ("Menlo",),
+  linestretch: 1.4,
+  sectionnumbering: none,
+  linkcolor: none,
+  citecolor: none,
+  filecolor: none,
+  pagenumbering: none,
+  doc,
+) = {
+  // Document metadata
+  set document(title: title, keywords: keywords)
+  set document(
+    author: authors.map(author => content-to-string(author.name)).join(", ", last: " & "),
+  ) if authors != none and authors != ()
+
+  // Page setup: dark background, no page numbers
+  set page(
+    paper: paper,
+    margin: margin,
+    numbering: pagenumbering,
+    columns: cols,
+    fill: colors.bg,
+  )
+
+  // Base text
+  set par(justify: true, leading: linestretch * 0.65em)
+  set text(
+    lang: lang,
+    region: region,
+    size: fontsize,
+    fill: colors.text,
+    font: font,
+  )
+
+  // Math and code fonts
+  show math.equation: set text(font: mathfont) if mathfont != none
+  show raw: set text(font: codefont) if codefont != none
+
+  // Headings
+  set heading(numbering: sectionnumbering)
+  show heading: set text(fill: colors.heading, weight: "semibold")
+  show heading.where(level: 1): it => {
+    v(0.8em)
+    text(size: 1.6em, weight: "bold", fill: colors.heading, it.body)
+    v(0.4em)
+  }
+  show heading.where(level: 2): it => {
+    v(0.6em)
+    text(size: 1.3em, weight: "semibold", fill: colors.heading, it.body)
+    v(0.3em)
+  }
+  show heading.where(level: 3): it => {
+    v(0.4em)
+    text(size: 1.1em, weight: "semibold", fill: colors.heading, it.body)
+    v(0.2em)
+  }
+
+  // Links
+  show link: set text(fill: colors.link)
+
+  // Code blocks
+  show raw.where(block: true): it => {
+    block(
+      width: 100%,
+      fill: colors.code-bg,
+      inset: 12pt,
+      radius: 6pt,
+      text(fill: colors.code-text, size: 0.9em, it)
+    )
+  }
+
+  // Inline code
+  show raw.where(block: false): it => {
+    box(
+      fill: colors.inline-code-bg,
+      inset: (x: 4pt, y: 2pt),
+      outset: (y: 2pt),
+      radius: 3pt,
+      text(fill: colors.code-text, size: 0.9em, it)
+    )
+  }
+
+  // Blockquotes
+  show quote.where(block: true): it => {
+    block(
+      width: 100%,
+      inset: (left: 16pt, top: 8pt, bottom: 8pt, right: 8pt),
+      stroke: (left: 3pt + colors.quote-border),
+      text(fill: colors.quote-text, it.body)
+    )
+  }
+
+  // Tables
+  set table(
+    inset: 8pt,
+    stroke: 0.5pt + colors.table-border,
+    fill: (_, row) => if row == 0 { colors.code-bg } else if calc.odd(row) { colors.table-alt-row } else { colors.bg },
+  )
+  show table.cell.where(y: 0): set text(fill: colors.heading, weight: "semibold")
+
+  // Horizontal rules - restyle the pandoc-defined horizontalrule
+  show line: set line(stroke: 0.5pt + colors.hr)
+
+  // Definition terms
+  show terms.item: it => block(breakable: false)[
+    #text(weight: "bold")[#it.term]
+    #block(inset: (left: 1.5em, top: -0.4em))[#it.description]
+  ]
+
+  // Lists - slightly muted bullets
+  set list(marker: text(fill: colors.muted, sym.bullet))
+  set enum(numbering: n => text(fill: colors.muted, str(n) + "."))
+
+  // Title block
+  block(below: 1em, width: 100%)[
+    #if title != none {
+      align(center, block[
+        #text(weight: "bold", size: 1.5em, fill: colors.heading, hyphenate: false)[#title]
+        #(if subtitle != none {
+          parbreak()
+          text(weight: "bold", size: 1.25em, fill: colors.heading, hyphenate: false)[#subtitle]
+        })
+      ])
+    }
+
+    #if authors != none and authors != [] {
+      let count = authors.len()
+      let ncols = calc.min(count, 3)
+      grid(
+        columns: (1fr,) * ncols,
+        row-gutter: 1.5em,
+        ..authors.map(author => align(center)[
+          #text(fill: colors.heading)[#author.name] \
+          #text(fill: colors.muted)[#author.affiliation] \
+          #text(fill: colors.muted)[#author.email]
+        ])
+      )
+    }
+
+    #if date != none {
+      align(center)[#block(inset: 1em)[
+        #text(fill: colors.muted)[#date]
+      ]]
+    }
+
+    #if abstract != none {
+      block(inset: 2em)[
+        #text(weight: "semibold", fill: colors.heading)[#abstract-title] #h(1em) #abstract
+      ]
+    }
+  ]
+
+  doc
+}
