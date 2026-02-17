@@ -11,29 +11,17 @@
 - Avoid using `cd` to change directories in bash commands. Trust the current working directory and run commands directly (e.g., use `git status` not `git -C /path status` when already in the repo).
 - Always place imports at the top of the file, never inside functions or methods
 
-<<<<<<< Updated upstream
-
-## Linter: Unused Import Stripping (CRITICAL)
-
-A linter runs after every edit and **immediately deletes** any import that isn't used in the file at that moment. This means:
-
-- **NEVER edit imports in a separate Edit call from the code that uses them.** The linter will delete the new imports before your next edit even runs.
-- Always include both the import change AND the consuming code change in a **single Edit call**.
-- If you need to change a base class, rename a function, or swap a library -- do the import + usage in one shot.
-
-- # You do NOT need to rewrite the whole file -- just make sure each individual Edit leaves all imports in a used state
-
 # Code Editing Rules
 
 - A `ruff check --fix` post-edit hook auto-removes unused imports. When adding a new import, always include it in the **same edit** as the code that uses it. Never add an import in one edit and the usage in a separate edit -- ruff will strip it in between. If the import and usage are in different parts of the file, make a single larger edit covering both.
-  > > > > > > > Stashed changes
 
 # Task Management
 
 - User uses **Taskwarrior** (v3, SQLite-backed) for todo tracking
 - Data lives at `~/.task/taskchampion.sqlite3`
-- IMPORTANT: Always run `task next` at the start of every conversation and present a brief summary grouped by priority (H/M/L) with task descriptions
+- Check tasks (`task next`) only when contextually relevant -- e.g., user asks about their tasks, starts working on something, or wants to mark work done. Do NOT check at the start of every conversation
 - When user mentions work to do, add it with `task add`. If priority, tag, or project isn't clear from context, use AskUserQuestion to confirm before adding
+- When we start working on something that matches a task, mark it started with `task <id> start`
 - When work is completed together in a session, mark it done with `task <id> done`. Otherwise ask/wait for user to confirm
 - Keep task descriptions short (a few words)
 - Conventions:
