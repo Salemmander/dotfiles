@@ -4,9 +4,14 @@ set -e
 echo "Installing dependencies for Arch Linux..."
 echo
 
-# Core packages (common + bash)
+# Core packages
 echo "Installing core packages..."
-sudo pacman -S --needed neovim tmux starship zoxide eza bash
+sudo pacman -S --needed neovim tmux starship zoxide eza zsh
+
+# Zsh plugins
+echo
+echo "Installing zsh plugins..."
+sudo pacman -S --needed zsh-autosuggestions zsh-history-substring-search zsh-syntax-highlighting
 
 # Hyprland
 echo
@@ -16,26 +21,10 @@ sudo pacman -S --needed hyprland
 # TPM for tmux
 echo
 if [ -d "$HOME/.tmux/plugins/tpm" ]; then
-    echo "TPM already installed, skipping..."
+	echo "TPM already installed, skipping..."
 else
-    echo "Installing TPM (Tmux Plugin Manager)..."
-    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-fi
-
-# ble.sh (from AUR)
-echo
-echo "Installing ble.sh..."
-if command -v ble &> /dev/null || [ -f ~/.local/share/blesh/ble.sh ]; then
-    echo "ble.sh already installed, skipping..."
-else
-    if command -v yay &> /dev/null; then
-        yay -S --needed blesh-git
-    elif command -v paru &> /dev/null; then
-        paru -S --needed blesh-git
-    else
-        echo "WARNING: No AUR helper (yay/paru) found. Install blesh-git manually:"
-        echo "  yay -S blesh-git"
-    fi
+	echo "Installing TPM (Tmux Plugin Manager)..."
+	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 fi
 
 # Verify neovim version
@@ -45,16 +34,19 @@ NVIM_MAJOR=$(echo "$NVIM_VERSION" | cut -d. -f1)
 NVIM_MINOR=$(echo "$NVIM_VERSION" | cut -d. -f2)
 
 if [ "$NVIM_MAJOR" -eq 0 ] && [ "$NVIM_MINOR" -lt 11 ]; then
-    echo "WARNING: Neovim version $NVIM_VERSION is older than 0.11"
-    echo "LazyVim may not work correctly. Consider updating neovim."
+	echo "WARNING: Neovim version $NVIM_VERSION is older than 0.11"
+	echo "LazyVim may not work correctly. Consider updating neovim."
 else
-    echo "Neovim version $NVIM_VERSION OK"
+	echo "Neovim version $NVIM_VERSION OK"
 fi
 
 echo
 echo "=== Installation Complete ==="
 echo
 echo "Deploy configs with stow:"
-echo "  stow -t ~ common bash hyprland"
+echo "  stow -t ~ common hyprland"
 echo
 echo "After deploying, open tmux and press prefix + I to install plugins."
+echo
+echo "To use zsh in Ghostty, add this to ~/.config/ghostty/config:"
+echo "  command = /usr/bin/zsh"
