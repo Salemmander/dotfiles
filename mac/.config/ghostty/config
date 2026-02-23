@@ -28,3 +28,9 @@ palette = 13=#75bbb3
 palette = 14=#8CD3CB
 palette = 15=#9eebb3
 keybind = shift+enter=text:\x1b\r
+keybind = global:super+grave_accent=toggle_quick_terminal
+quick-terminal-position = bottom
+quick-terminal-size = 40%
+macos-titlebar-style = transparent
+mouse-hide-while-typing = true
+macos-option-as-alt = true
