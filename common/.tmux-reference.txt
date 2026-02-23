@@ -1,0 +1,40 @@
+
+           QUICK REFERENCE
+
+Prefix-free (direct):
+  Alt+d            split vertical (side by side)
+  Alt+Shift+d      split horizontal (stacked)
+  Alt+h/j/k/l      navigate panes
+  Ctrl+h/j/k/l     resize panes (repeatable)
+  Alt+Shift+h      previous window
+  Alt+Shift+l      next window
+  Alt+n            new window
+  Alt+w            close pane
+  Alt+/            show this reference
+
+Prefix (Ctrl+a, then key):
+  d                detach from session
+  ,                rename current window
+  $                rename current session
+  s                list/switch sessions
+  [                enter copy mode
+  :                command prompt
+  ?                list all keybindings
+  Shift+i          install TPM plugins
+
+Copy mode (enter with Ctrl+a [):
+  h/j/k/l          navigate
+  v                start selection
+  y                yank (copy to clipboard)
+  q                exit copy mode
+
+Shell commands:
+  dev [directory]          open dev session (claude + nvim)
+  tmux ls                  list sessions
+  tmux kill-session -t name  kill a session
+  tmux kill-server         kill all sessions
+
+Session management (inside tmux):
+  Ctrl+a s       list/switch sessions
+  Ctrl+a d       detach (session keeps running)
+  Ctrl+a $       rename current session
