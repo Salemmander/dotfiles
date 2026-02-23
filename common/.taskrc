@@ -41,9 +41,12 @@ color.overdue=bold red
 
 # Active and blocked
 color.active=bold cyan
-color.blocked=bold black
+color.blocked=color243
 color.blocking=bold magenta
 
 # Task states
 color.completed=gray10
 color.deleted=bold black
+report.next.columns=id,depends,priority,project,tags,due.relative,description.count
+report.next.labels=ID,Deps,P,Project,Tags,Due,Description
+dateformat.annotation=Y-M-D
