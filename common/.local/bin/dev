@@ -1,0 +1,31 @@
+#!/bin/zsh
+# Open a dev session: claude on the left, nvim on the right
+# Usage: dev [directory]
+
+DIR="${1:-.}"
+DIR="$(cd "$DIR" && pwd)"
+SESSION="$(basename "$DIR")"
+
+# Helper: attach or switch depending on whether we're inside tmux
+connect() {
+    if [ -n "$TMUX" ]; then
+        tmux switch-client -t "$SESSION"
+    else
+        tmux attach -t "$SESSION"
+    fi
+}
+
+# Attach if session already exists
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+    connect
+    exit 0
+fi
+
+# Create session: left pane for claude, right pane for nvim
+tmux new-session -d -s "$SESSION" -c "$DIR"
+tmux split-window -h -t "$SESSION" -c "$DIR"
+tmux send-keys -t "$SESSION:.1" "claude --continue" Enter
+tmux send-keys -t "$SESSION:.2" "nvim" Enter
+tmux select-pane -t "$SESSION:.1"
+
+connect
