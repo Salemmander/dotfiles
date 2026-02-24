@@ -26,6 +26,14 @@ alias d='docker'
 alias r='rails'
 n() { if [ "$#" -eq 0 ]; then nvim .; else nvim "$@"; fi; }
 
+# Tmux
+alias t='tmux'
+alias ta='tmux attach -t'
+alias tl='tmux ls'
+alias tn='tmux new -s'
+alias tk='tmux kill-session -t'
+alias tks='tmux kill-server'
+
 # Git
 alias g='git'
 alias gs='git status'
