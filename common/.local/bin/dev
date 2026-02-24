@@ -24,7 +24,7 @@ fi
 # Create session: left pane for claude, right pane for nvim
 tmux new-session -d -s "$SESSION" -c "$DIR"
 tmux split-window -h -t "$SESSION" -c "$DIR"
-tmux send-keys -t "$SESSION:.1" "claude --continue" Enter
+tmux send-keys -t "$SESSION:.1" "claude --continue 2>/dev/null || claude" Enter
 tmux send-keys -t "$SESSION:.2" "nvim" Enter
 tmux select-pane -t "$SESSION:.1"
 
