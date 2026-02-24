@@ -10,6 +10,7 @@ Prefix-free (direct):
   Alt+Shift+l      next window
   Alt+n            new window
   Alt+w            close pane
+  Alt+f            toggle pane zoom (fullscreen)
   Alt+/            show this reference
 
 Prefix (Ctrl+a, then key):
