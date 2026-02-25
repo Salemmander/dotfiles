@@ -6,7 +6,7 @@ echo
 
 # Core packages
 echo "Installing core packages..."
-sudo pacman -S --needed neovim tmux starship zoxide eza zsh
+sudo pacman -S --needed neovim tmux starship zoxide eza zsh jq stow fzf bat
 
 # Zsh plugins
 echo
@@ -27,6 +27,15 @@ else
 	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 fi
 
+# Claude Code
+echo
+echo "Installing Claude Code..."
+if command -v claude &>/dev/null; then
+	echo "Claude Code already installed, skipping..."
+else
+	curl -fsSL https://claude.ai/install.sh | bash
+fi
+
 # Verify neovim version
 echo
 NVIM_VERSION=$(nvim --version | head -1 | grep -oP 'v\K[0-9]+\.[0-9]+')
@@ -44,7 +53,7 @@ echo
 echo "=== Installation Complete ==="
 echo
 echo "Deploy configs with stow:"
-echo "  stow -t ~ common hyprland"
+echo "  stow -t ~ common hyprland claude"
 echo
 echo "After deploying, open tmux and press prefix + I to install plugins."
 echo

@@ -41,8 +41,6 @@ oc() {
     fi
 }
 
-md2pdf() { pandoc -d pdf -V template="$HOME/.local/share/pandoc/obsidian-dark.typst" "$1" -o "${1%.md}.pdf"; }
-
 autoload -U +X bashcompinit && bashcompinit
 
 # Conda (if installed)
