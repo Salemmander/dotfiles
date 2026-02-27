@@ -24,7 +24,7 @@ Stage, commit, and optionally push git changes interactively.
 - NEVER force push (`--force`, `--force-with-lease`)
 - NEVER push to `main` or `master` without explicitly warning the user first
 - Always create NEW commits, never amend existing ones
-- Use HEREDOC syntax for commit messages to preserve formatting
+- Use `-m` flags for commit messages (multiple `-m` for subject + body) to keep commands single-line
 - Warn about files that look like secrets: `.env`, `credentials`, `*.key`, `*.pem`, `*.secret`, tokens, passwords
 
 ## Instructions
@@ -87,13 +87,10 @@ Display the full commit message to the user and ask for approval using AskUserQu
 
 ### Step 5: Commit
 
-Create the commit using HEREDOC for the message:
+Create the commit using `-m` flags. Use one `-m` for the summary and a second `-m` for the body (git will separate them with a blank line automatically). If the change is trivial and has no body, use a single `-m`.
 
 ```bash
-git commit -m "$(cat <<'EOF'
-<commit message here>
-EOF
-)"
+git commit -m "Summary line" -m "Body paragraph."
 ```
 
 Show the resulting commit hash.
