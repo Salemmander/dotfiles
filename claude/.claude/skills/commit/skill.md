@@ -114,18 +114,15 @@ Check if the branch has an upstream:
 git rev-parse --abbrev-ref @{upstream} 2>/dev/null
 ```
 
-Ask the user if they want to push using AskUserQuestion:
+Push the commit. The permission system will prompt the user for approval, so do NOT use AskUserQuestion here (that would double-prompt).
 
-- "Push" -- push to the remote (use `-u` if no upstream is set)
-- "Skip" -- done, don't push
-
-If they choose to push:
+If the branch has an upstream:
 
 ```bash
 git push
 ```
 
-Or if no upstream:
+If no upstream:
 
 ```bash
 git push -u origin <branch>
