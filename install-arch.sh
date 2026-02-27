@@ -49,6 +49,11 @@ else
 	echo "Neovim version $NVIM_VERSION OK"
 fi
 
+# Git global ignore
+echo
+echo "Configuring global gitignore..."
+git config --global core.excludesfile ~/.gitignore_global
+
 echo
 echo "=== Installation Complete ==="
 echo
