@@ -1,5 +1,17 @@
 # dotfiles
 
+> **TODO (home machine):** Install Claude Code MCP servers. Run these after deploying the `claude` stow package:
+>
+> ```bash
+> # Prerequisites: Node.js (npx), uv (uvx)
+> uv tool install leann-core --with leann
+> claude mcp add --scope user playwright npx '@playwright/mcp@latest'
+> claude mcp add --scope user serena -- uvx --from 'git+https://github.com/oraios/serena' serena start-mcp-server --context=claude-code --project-from-cwd
+> claude mcp add --scope user leann-server -- leann_mcp
+> ```
+>
+> Delete this block once done.
+
 Personal dotfiles managed with GNU Stow.
 
 ## Stow Usage
@@ -39,6 +51,7 @@ Then deploy configs with stow (see per-package instructions below).
 Cross-platform configurations for Neovim, tmux, and starship prompt.
 
 **Contents:**
+
 - `.tmux.conf` - Tmux with vim-like keybindings
 - `.config/nvim/` - Neovim with LazyVim distribution
 - `.config/starship.toml` - Starship prompt theme
@@ -76,6 +89,7 @@ stow -t ~ common
 macOS-specific configs for zsh and Ghostty terminal.
 
 **Contents:**
+
 - `.zshrc` - Zsh configuration with plugins and aliases
 - `.config/ghostty/config` - Ghostty terminal settings
 - `.config/nvim/lua/plugins/theme.lua` - macOS theme override
@@ -113,6 +127,7 @@ Create `~/.zshrc.local` for machine-specific environment variables (not tracked)
 Bash shell configuration for Linux systems.
 
 **Contents:**
+
 - `.bashrc` - Bash config with ble.sh, aliases, conda setup
 - `.bash_profile` - Sources .bashrc
 
@@ -147,6 +162,7 @@ stow -t ~ bash
 Hyprland window manager configuration for Linux.
 
 **Contents:**
+
 - `.config/hypr/monitors.conf` - Monitor and lid switch configuration
 - `.config/hypr/scripts/lid-close.sh` - Lid close handler
 - `.config/hypr/scripts/lid-open.sh` - Lid open handler
