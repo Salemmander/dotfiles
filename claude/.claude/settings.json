@@ -45,6 +45,11 @@
     "type": "command",
     "command": "$HOME/.claude/statusline.sh"
   },
+  "enabledPlugins": {
+    "clangd-lsp@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "lua-lsp@claude-plugins-official": true
+  },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
       "source": {
@@ -52,11 +57,5 @@
         "repo": "anthropics/claude-plugins-official"
       }
     }
-  },
-  "model": "opus",
-  "enabledPlugins": {
-    "clangd-lsp@claude-plugins-official": true,
-    "pyright-lsp@claude-plugins-official": true,
-    "lua-lsp@claude-plugins-official": true
   }
 }
