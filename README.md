@@ -1,17 +1,5 @@
 # dotfiles
 
-> **TODO (home machine):** Install Claude Code MCP servers. Run these after deploying the `claude` stow package:
->
-> ```bash
-> # Prerequisites: Node.js (npx), uv (uvx)
-> uv tool install leann-core --with leann
-> claude mcp add --scope user playwright npx '@playwright/mcp@latest'
-> claude mcp add --scope user serena -- uvx --from 'git+https://github.com/oraios/serena' serena start-mcp-server --context=claude-code --project-from-cwd
-> claude mcp add --scope user leann-server -- leann_mcp
-> ```
->
-> Delete this block once done.
-
 Personal dotfiles managed with GNU Stow.
 
 ## Stow Usage
