@@ -1,7 +1,7 @@
 ---
 name: commit
 description: Stage, commit, and optionally push changes. Shows diff, drafts a commit message for approval, and asks before pushing.
-allowed-tools: Bash(git *), Bash(date *), AskUserQuestion
+allowed-tools: Bash(git *), Bash(date *)
 ---
 
 # Commit and Push
@@ -78,15 +78,11 @@ Rules for auto-generated messages:
 
 ### Step 4: Confirm commit message
 
-IMPORTANT: Do NOT call any other tools in the same response as AskUserQuestion. Display the proposed commit message as text output, then call AskUserQuestion alone with no other tool calls in the same response. Wait for the user's answer before continuing.
-
-Ask for approval using AskUserQuestion with these options:
+Display the full commit message to the user and ask for approval using AskUserQuestion:
 
 - "Looks good" -- proceed with this message
 - "Edit" -- ask what to change, then re-display
 - "Abort" -- unstage (`git reset HEAD`) and stop (working directory changes are kept)
-
-Do NOT proceed to Step 5 until the user has responded.
 
 ### Step 5: Commit
 
