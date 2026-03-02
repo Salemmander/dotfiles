@@ -2,7 +2,6 @@
 name: commit
 description: Stage, commit, and optionally push changes. Shows diff, drafts a commit message for approval, and asks before pushing.
 allowed-tools: Bash(git *), Bash(date *), AskUserQuestion
-disable-model-invocation: true
 ---
 
 # Commit and Push
