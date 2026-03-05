@@ -28,6 +28,7 @@
     ],
     "defaultMode": "default"
   },
+  "model": "opus",
   "hooks": {
     "PostToolUse": [
       {
