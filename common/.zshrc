@@ -24,6 +24,7 @@ _source_plugin zsh-syntax-highlighting
 unfunction _source_plugin
 
 export EDITOR=nvim
+bindkey -e
 
 # Omarchy envs and functions (Linux)
 [[ -f ~/.local/share/omarchy/default/bash/envs ]] && source ~/.local/share/omarchy/default/bash/envs
