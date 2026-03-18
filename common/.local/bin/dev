@@ -1,5 +1,5 @@
 #!/bin/zsh
-# Open a dev session: claude on the left, nvim on the right
+# Open a dev session: claude on the left, terminal on the right
 # Usage: dev [directory]
 
 DIR="${1:-.}"
@@ -21,11 +21,10 @@ if tmux has-session -t "$SESSION" 2>/dev/null; then
     exit 0
 fi
 
-# Create session: left pane for claude, right pane for nvim
+# Create session: left pane for claude, right pane for terminal
 tmux new-session -d -s "$SESSION" -c "$DIR"
 tmux split-window -h -t "$SESSION" -c "$DIR"
 tmux send-keys -t "$SESSION:.1" "claude --continue 2>/dev/null || claude" Enter
-tmux send-keys -t "$SESSION:.2" "nvim" Enter
 tmux select-pane -t "$SESSION:.1"
 
 connect
