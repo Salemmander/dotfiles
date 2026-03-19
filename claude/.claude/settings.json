@@ -40,6 +40,16 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/lint-on-stop.sh"
+          }
+        ]
+      }
     ]
   },
   "statusLine": {

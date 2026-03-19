@@ -9,10 +9,6 @@
 - Never use emojis in any files
 - Always place imports at the top of the file, never inside functions or methods
 
-# Code Editing Rules
-
-- A `ruff check --fix` post-edit hook auto-removes unused imports. When adding a new import, always include it in the **same edit** as the code that uses it. Never add an import in one edit and the usage in a separate edit -- ruff will strip it in between. If the import and usage are in different parts of the file, make a single larger edit covering both.
-
 # Task Management
 
 - User uses **Taskwarrior** (v3, SQLite-backed) for todo tracking

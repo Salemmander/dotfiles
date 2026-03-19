@@ -6,8 +6,9 @@ export PATH="$HOME/.local/share/nvim/mason/bin:$PATH"
 # Read hook input from stdin
 input=$(cat)
 
-# Extract file path using jq
+# Extract file path and session ID using jq
 file_path=$(echo "$input" | jq -r '.tool_input.file_path // empty')
+session_id=$(echo "$input" | jq -r '.session_id // "default"')
 
 if [ -z "$file_path" ] || [ ! -f "$file_path" ]; then
 	exit 0
@@ -16,7 +17,8 @@ fi
 # Format based on file extension (matching LazyVim/conform.nvim defaults)
 case "$file_path" in
 *.py)
-	command -v ruff &>/dev/null && ruff format "$file_path" && ruff check --fix "$file_path"
+	command -v ruff &>/dev/null && ruff format "$file_path"
+	echo "$file_path" >>"/tmp/claude-ruff-${session_id}.txt"
 	;;
 *.lua)
 	# Use nvim stylua.toml config if no local config exists
