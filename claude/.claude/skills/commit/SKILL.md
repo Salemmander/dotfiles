@@ -1,5 +1,7 @@
 ---
 name: commit
+model: haiku
+context: fork
 description: Stage, commit, and push changes. Drafts a commit message then commits and pushes with permission approval.
 allowed-tools: Bash(git *)
 ---
