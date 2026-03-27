@@ -46,7 +46,7 @@ Run `git diff --cached` and draft a commit message:
 - Body: what changed and why, wrapped at 72 chars. Omit if the change is trivial.
 - Match the style of recent commits from Step 1.
 
-Display the message to the user, then proceed.
+Do not pause or ask for confirmation — proceed straight to commit.
 
 ### Step 4: Commit
 
@@ -68,4 +68,6 @@ If on `main` or `master`, warn the user. The permission system will prompt for p
 
 Push with `git push`, or `git push -u origin <branch>` if no upstream exists.
 
-Report the commit hash, branch, and push status in a single line.
+### Step 6: Report
+
+Report back with: the commit message, commit hash, branch, and push status.
