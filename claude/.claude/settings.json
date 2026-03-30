@@ -28,6 +28,7 @@
     ],
     "defaultMode": "default"
   },
+  "model": "opus[1m]",
   "hooks": {
     "PostToolUse": [
       {
@@ -67,6 +68,5 @@
         "repo": "anthropics/claude-plugins-official"
       }
     }
-  },
-  "model": "opus[1m]"
+  }
 }
