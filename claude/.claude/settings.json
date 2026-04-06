@@ -17,7 +17,8 @@
       "Bash(cat *)",
       "Bash(which *)",
       "Bash(echo *)",
-      "Skill(task)"
+      "Skill(task)",
+      "Bash(task *)"
     ],
     "ask": [
       "Bash(git*push*)",

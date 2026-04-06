@@ -1,6 +1,6 @@
 ---
 name: task
-description: Manage Taskwarrior todos. Add, start, complete, and query tasks. Invoke with /task or triggered when user mentions work to do.
+description: Manage Taskwarrior todos. ALWAYS use this skill for ANY `task` command -- never run `task` directly via Bash. Invoke with /task or triggered when user mentions work to do.
 allowed-tools: Bash(task *)
 ---
 
