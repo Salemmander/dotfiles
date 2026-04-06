@@ -17,7 +17,6 @@
       "Bash(cat *)",
       "Bash(which *)",
       "Bash(echo *)",
-      "Bash(task *)"
     ],
     "ask": [
       "Bash(git*push*)",

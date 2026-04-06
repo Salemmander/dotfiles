@@ -15,20 +15,13 @@
 - Multiple packages: `uv run --with pkg1 --with pkg2 python script.py`
 - This avoids polluting any project's virtualenv. `uv` caches packages so repeat runs are fast
 
+# Behavior
+
+- Confirm your approach before editing files -- especially when debugging or making multi-file changes
+- Show raw output from commands, queries, and skills. Do not summarize or truncate unless asked
+- Focus on root cause analysis. Do not suggest workarounds unless the user asks or root cause is confirmed out of scope
+- Be concise by default. When the user asks "why" or "how does X work", or the topic is clearly new to them, give full detail
+
 # Task Management
 
-- User uses **Taskwarrior** (v3, SQLite-backed) for todo tracking
-- Data lives at `~/.task/taskchampion.sqlite3`
-- Check tasks (`task next`) only when contextually relevant -- e.g., user asks about their tasks, starts working on something, or wants to mark work done. Do NOT check at the start of every conversation
-- When user mentions work to do, add it with `task add`. If priority, tag, or project isn't clear from context, use AskUserQuestion to confirm before adding
-- When we start working on something that matches a task, mark it started with `task <id> start`
-- When work is completed together in a session, mark it done with `task <id> done`. Otherwise ask/wait for user to confirm
-- Keep task descriptions short (a few words)
-- Conventions:
-  - project: = repo name (e.g., project:auth-service). Leave blank if task doesn't belong to a specific repo
-  - Tags: +bug, +feature, +chore (pick one per task), +blocked (when waiting on someone/something)
-  - Only use tags from this list. Do not create new tags unless user explicitly asks
-  - Priority: always set one. H = urgent, M = normal, L = low/unclear
-  - Due dates: only when user explicitly mentions a deadline
-  - Dependencies: use `task <id> modify depends:<other_id>` when one task must complete before another. Taskwarrior will color blocking tasks differently (purple) to show they're on the critical path
-  - Annotations: use `task <id> annotate "..."` to attach extra context when a task has details that don't fit in the short description (e.g., approach notes, blockers, links). Not every task needs one -- only annotate when there's meaningful context to preserve
+- User uses Taskwarrior for todo tracking -- see `/task` skill for conventions and workflow
