@@ -2,11 +2,17 @@
 
 MODEL="gemma4:26b"
 
+RAW=false
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -m)
       MODEL="$2"
       shift 2
+      ;;
+    -r)
+      RAW=true
+      shift
       ;;
     *)
       break
@@ -36,11 +42,12 @@ trap 'kill $SPIN_PID 2>/dev/null; echo ""; exit' INT TERM
 
 RESPONSE=$(curl -s --no-buffer http://localhost:11434/api/generate \
   -d "$(printf '{"model":"%s","system":"Be concise. Use markdown for formatting. Never use LaTeX-style markup like backslash-wrapped text.","prompt":"%s"}' "$MODEL" "$(echo "$PROMPT" | sed 's/"/\\"/g')")" \
-  | while IFS= read -r line; do
-      printf '%s' "$(echo "$line" | sed -n 's/.*"response":"\([^"]*\)".*/\1/p')" | sed 's/\\n/\
-/g; s/\\t/\t/g; s/\\"/"/g'
-    done)
+  | jq -rj '.response // empty')
 
 kill $SPIN_PID 2>/dev/null
 printf "\r\033[K" >&2
-echo "$RESPONSE" | glow -
+if $RAW; then
+  echo "$RESPONSE"
+else
+  echo "$RESPONSE" | glow -
+fi
