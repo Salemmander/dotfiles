@@ -40,8 +40,10 @@ done &
 SPIN_PID=$!
 trap 'kill $SPIN_PID 2>/dev/null; echo ""; exit' INT TERM
 
+SYSTEM="Be concise. Use markdown for formatting. Never use LaTeX-style markup like backslash-wrapped text."
+
 RESPONSE=$(curl -s --no-buffer http://localhost:11434/api/generate \
-  -d "$(printf '{"model":"%s","system":"Be concise. Use markdown for formatting. Never use LaTeX-style markup like backslash-wrapped text.","prompt":"%s"}' "$MODEL" "$(echo "$PROMPT" | sed 's/"/\\"/g')")" \
+  -d "$(jq -n --arg m "$MODEL" --arg s "$SYSTEM" --arg p "$PROMPT" '{model:$m,system:$s,prompt:$p}')" \
   | jq -rj '.response // empty')
 
 kill $SPIN_PID 2>/dev/null
