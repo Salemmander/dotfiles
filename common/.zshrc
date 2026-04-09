@@ -13,6 +13,7 @@ _source_plugin() {
 }
 
 _source_plugin zsh-autosuggestions
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#53685B"
 
 _source_plugin zsh-history-substring-search
 BINDKEY_DEFAULT_INSTALL=true
