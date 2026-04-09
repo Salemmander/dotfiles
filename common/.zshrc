@@ -15,12 +15,12 @@ _source_plugin() {
 _source_plugin zsh-autosuggestions
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#53685B"
 
+_source_plugin zsh-syntax-highlighting
+
 _source_plugin zsh-history-substring-search
 BINDKEY_DEFAULT_INSTALL=true
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
-
-_source_plugin zsh-syntax-highlighting
 
 unfunction _source_plugin
 
