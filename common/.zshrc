@@ -13,7 +13,7 @@ _source_plugin() {
 }
 
 _source_plugin zsh-autosuggestions
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#53685B"
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=8"
 
 _source_plugin zsh-syntax-highlighting
 
