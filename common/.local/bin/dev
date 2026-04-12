@@ -4,7 +4,7 @@
 
 DIR="${1:-.}"
 DIR="$(cd "$DIR" && pwd)"
-SESSION="$(basename "$DIR")"
+SESSION="$(basename "$DIR" | tr ':.' '__')"
 
 # Helper: attach or switch depending on whether we're inside tmux
 connect() {
