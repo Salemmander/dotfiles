@@ -147,13 +147,11 @@ stow -t ~ bash
 
 ## hyprland/
 
-Hyprland window manager configuration for Linux.
+Shared Hyprland configuration used on all Linux machines (laptop + desktop).
 
 **Contents:**
 
-- `.config/hypr/monitors.conf` - Monitor and lid switch configuration
-- `.config/hypr/scripts/lid-close.sh` - Lid close handler
-- `.config/hypr/scripts/lid-open.sh` - Lid open handler
+- `.config/hypr/bindings.conf` - Custom keybindings, application launchers, and webapp shortcuts (user overrides for Omarchy defaults)
 
 **Install dependencies:**
 
@@ -162,10 +160,30 @@ Hyprland window manager configuration for Linux.
 sudo pacman -S hyprland
 ```
 
-**Deploy:**
+**Deploy (all machines):**
 
 ```bash
 stow -t ~ hyprland
 ```
 
-Edit `monitors.conf` for your specific display setup after deploying.
+---
+
+## hyprland-laptop/
+
+Laptop-specific Hyprland configuration. Contains monitor layout, clamshell mode, lid handling, and hardware-specific autostart. **Only stow this on the laptop.**
+
+**Contents:**
+
+- `.config/hypr/monitors.conf` - Monitor layout, workspace pinning, and lid switch bindings
+- `.config/hypr/autostart.conf` - Laptop-only autostart commands
+- `.config/hypr/scripts/lid-close.sh` - Disable internal display / suspend on lid close
+- `.config/hypr/scripts/lid-open.sh` - Restore internal display on lid open
+
+**Deploy (laptop only):**
+
+```bash
+stow -t ~ hyprland
+stow -t ~ hyprland-laptop
+```
+
+**On desktop machines:** Only run `stow hyprland`. The laptop-specific files will not exist.
