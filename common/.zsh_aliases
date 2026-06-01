@@ -47,3 +47,6 @@ alias glog='git log --oneline --graph'
 alias gcm='git commit -m'
 alias gcam='git commit -a -m'
 alias gcad='git commit -a --amend'
+
+# gh for school
+alias ghe='GH_HOST=github.gatech.edu gh'

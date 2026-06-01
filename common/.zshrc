@@ -67,3 +67,5 @@ if [[ -o interactive ]]; then
   eval "$(zoxide init --cmd cd zsh)"
 fi
 eval "$(starship init zsh)"
+
+. "$HOME/.local/share/../bin/env"
