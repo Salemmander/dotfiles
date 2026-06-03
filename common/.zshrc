@@ -19,13 +19,30 @@ _source_plugin zsh-syntax-highlighting
 
 _source_plugin zsh-history-substring-search
 BINDKEY_DEFAULT_INSTALL=true
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
+bindkey -M viins '^?' backward-delete-char
+bindkey -M viins '^H' backward-delete-char
+bindkey -M viins '^[[A' history-substring-search-up
+bindkey -M viins '^[[B' history-substring-search-down
+bindkey -M vicmd '^[[A' history-substring-search-up
+bindkey -M vicmd '^[[B' history-substring-search-down
 
 unfunction _source_plugin
 
 export EDITOR=nvim
-bindkey -e
+bindkey -v
+KEYTIMEOUT=1
+
+zle-keymap-select() {
+  if [[ $KEYMAP == vicmd ]]; then
+    echo -ne '\e[1 q'
+  else
+    echo -ne '\e[5 q'
+  fi
+}
+zle -N zle-keymap-select
+
+zle-line-init() { echo -ne '\e[5 q' }
+zle -N zle-line-init
 
 # Omarchy envs and functions (Linux)
 [[ -f ~/.local/share/omarchy/default/bash/envs ]] && source ~/.local/share/omarchy/default/bash/envs
