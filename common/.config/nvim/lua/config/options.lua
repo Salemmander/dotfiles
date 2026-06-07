@@ -3,3 +3,5 @@
 -- Add any additional options here
 vim.opt.relativenumber = true
 vim.opt.smoothscroll = true
+vim.opt.autoread = true
+vim.opt.updatetime = 500

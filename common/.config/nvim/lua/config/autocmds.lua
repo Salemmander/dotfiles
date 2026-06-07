@@ -6,3 +6,16 @@
 --
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
+
+local external_file_changes = vim.api.nvim_create_augroup("external_file_changes", { clear = true })
+
+local function check_external_file_changes()
+  if vim.fn.mode() ~= "c" then
+    vim.cmd("silent! checktime")
+  end
+end
+
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+  group = external_file_changes,
+  callback = check_external_file_changes,
+})
