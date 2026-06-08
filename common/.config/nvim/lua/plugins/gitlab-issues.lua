@@ -45,66 +45,150 @@ end
 -- Picker: fetches all open group issues and opens the picker
 -- ============================================================
 local function gitlab_issues()
+  -- Closure state
+  local all_items = {}
+  local assigned_only = false
+  local username = nil
+
+  -- Title reflects the current assignee filter
+  local function title_for()
+    if assigned_only then
+      return "GitLab Issues [cnoe-automation] (mine)"
+    end
+    return "GitLab Issues [cnoe-automation]"
+  end
+
+  -- Returns a filtered or unfiltered view of all_items
+  local function compute_items()
+    if not assigned_only then
+      return all_items
+    end
+    return vim.tbl_filter(function(item)
+      return vim.tbl_contains(item.assignee_usernames, username)
+    end, all_items)
+  end
+
+  -- Returns a comma-separated string of assignee display names (for the preview)
+  local function get_assignees(issue)
+    return table.concat(
+      vim.tbl_map(function(a)
+        return a.name
+      end, issue.assignees or {}),
+      ", "
+    )
+  end
+
+  -- Returns a list of assignee usernames (for the assignee filter)
+  local function get_assignee_usernames(issue)
+    return vim.tbl_map(function(a)
+      return a.username
+    end, issue.assignees or {})
+  end
+
+  -- Returns a comma-separated string of label names.
+  -- Labels can come back as either strings or objects depending on the API version.
+  local function get_labels(issue)
+    return table.concat(
+      vim.tbl_map(function(l)
+        return type(l) == "string" and l or l.name
+      end, issue.labels or {}),
+      ", "
+    )
+  end
+
+  -- Builds a picker item from a raw issue object.
+  -- Flattens the fields we care about so the preview and filters don't navigate nested tables.
+  local function make_item(issue)
+    local repo = (issue.web_url or ""):match("gitlab%.verizon%.com/(.-)/-/issues")
+    return {
+      text = string.format("#%-5d %s", issue.iid, issue.title),
+      iid = issue.iid,
+      repo = repo or "",
+      title = issue.title,
+      state = issue.state,
+      author = issue.author and issue.author.name or "",
+      assignees = get_assignees(issue),
+      assignee_usernames = get_assignee_usernames(issue),
+      labels = get_labels(issue),
+      created = (issue.created_at or ""):sub(1, 10),
+      description = issue.description or "",
+      url = issue.web_url or "",
+    }
+  end
+
+  -- Opens the picker once both async fetches (user + issues) have completed.
+  -- Using a simple pending counter; math.huge acts as a sentinel to suppress opening on error.
+  local pending = 2
+
+  local function try_open()
+    if pending > 0 then
+      return
+    end
+    Snacks.picker({
+      title = title_for(),
+      layout = LAYOUT,
+      items = compute_items(),
+      format = function(item)
+        return { { item.text } }
+      end,
+      preview = issue_preview,
+      actions = {
+        view_issue = function(picker, item)
+          vim.ui.open(item.url)
+        end,
+        toggle_assignee = function(picker)
+          if not username then
+            vim.notify("gitlab-issues: GitLab username unavailable; assignee filter has no effect", vim.log.levels.WARN)
+            return
+          end
+          assigned_only = not assigned_only
+          picker.opts.items = compute_items()
+          picker.title = title_for()
+          picker:find({ refresh = true })
+        end,
+      },
+      win = {
+        input = {
+          keys = {
+            ["<C-o>"] = { "view_issue", mode = { "i", "n" } },
+            ["<C-f>"] = { "toggle_assignee", mode = { "i", "n" } },
+          },
+        },
+      },
+    })
+  end
+
+  -- Fetch the current GitLab username (needed for the assignee filter).
+  -- Non-fatal: if it fails the picker still opens, but <C-a> will warn and no-op.
+  vim.system({ "glab", "api", "user", "--output", "json" }, { text = true }, function(out)
+    vim.schedule(function()
+      local ok, user = pcall(vim.json.decode, out.stdout)
+      if ok and type(user) == "table" and type(user.username) == "string" then
+        username = user.username
+      else
+        vim.notify("gitlab-issues: could not resolve GitLab username (glab api user failed)", vim.log.levels.WARN)
+      end
+      pending = pending - 1
+      try_open()
+    end)
+  end)
+
+  -- Fetch all open issues in the cnoe-automation group.
+  -- Fatal: if this fails, suppress the picker by pinning pending to math.huge.
   local cmd = { "glab", "issue", "list", "-g", "cnoe-automation", "-O", "json", "--all" }
   vim.system(cmd, { text = true }, function(out)
     vim.schedule(function()
       local ok, issues = pcall(vim.json.decode, out.stdout)
       if not ok or type(issues) ~= "table" then
         vim.notify("gitlab-issues: " .. (out.stderr or out.stdout or ""), vim.log.levels.ERROR)
+        pending = math.huge -- sentinel: never open
         return
       end
-
-      -- Returns a comma-separated string of assignee display names
-      local function get_assignees(issue)
-        return table.concat(
-          vim.tbl_map(function(a)
-            return a.name
-          end, issue.assignees or {}),
-          ", "
-        )
-      end
-
-      -- Returns a comma-separated string of label names.
-      -- Labels can come back as either strings or objects depending on the API version.
-      local function get_labels(issue)
-        return table.concat(
-          vim.tbl_map(function(l)
-            return type(l) == "string" and l or l.name
-          end, issue.labels or {}),
-          ", "
-        )
-      end
-
-      -- Builds a picker item from a raw issue object.
-      -- Flattens the fields we care about so the preview and display don't need to navigate nested tables.
-      local function make_item(issue)
-        return {
-          text = string.format("#%-5d %s", issue.iid, issue.title),
-          title = issue.title,
-          state = issue.state,
-          author = issue.author and issue.author.name or "",
-          assignees = get_assignees(issue),
-          labels = get_labels(issue),
-          created = (issue.created_at or ""):sub(1, 10),
-          description = issue.description or "",
-          url = issue.web_url or "",
-        }
-      end
-
-      local items = {}
       for _, issue in ipairs(issues) do
-        table.insert(items, make_item(issue))
+        table.insert(all_items, make_item(issue))
       end
-
-      Snacks.picker({
-        title = "GitLab Issues [cnoe-automation]",
-        layout = LAYOUT,
-        items = items,
-        format = function(item)
-          return { { item.text } }
-        end,
-        preview = issue_preview,
-      })
+      pending = pending - 1
+      try_open()
     end)
   end)
 end
