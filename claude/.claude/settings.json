@@ -29,7 +29,6 @@
     ],
     "defaultMode": "default"
   },
-  "model": "opusplan",
   "hooks": {
     "PostToolUse": [
       {
@@ -70,5 +69,6 @@
       }
     }
   },
-  "effortLevel": "medium"
+  "effortLevel": "medium",
+  "model": "opusplan"
 }
