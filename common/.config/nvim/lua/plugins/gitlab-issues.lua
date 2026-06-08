@@ -185,6 +185,45 @@ local function gitlab_issues()
           end
           apply_filter(picker)
         end,
+        assign_self = function(picker, item)
+          if not username then
+            vim.notify("gitlab-issues: GitLab username unavailable", vim.log.levels.WARN)
+            return
+          end
+          local is_assigned = vim.tbl_contains(item.assignee_usernames, username)
+          local prefix = is_assigned and "-" or "+"
+          local action_label = is_assigned and "Unassigned from" or "Assigned to"
+          local pending_label = is_assigned and "Unassigning from" or "Assigning to"
+          vim.notify(pending_label .. " #" .. item.iid .. ": " .. item.title, vim.log.levels.INFO)
+          local cmd =
+            { "glab", "issue", "update", tostring(item.iid), "-R", item.repo, "--assignee", prefix .. username }
+          vim.system(cmd, { text = true }, function(out)
+            vim.schedule(function()
+              if out.code ~= 0 then
+                vim.notify("gitlab-issues: " .. (out.stderr or "update failed"), vim.log.levels.ERROR)
+                return
+              end
+              local encoded_repo = item.repo:gsub("/", "%%2F")
+              local api_path = "projects/" .. encoded_repo .. "/issues/" .. tostring(item.iid)
+              vim.system({ "glab", "api", api_path }, { text = true }, function(fetch_out)
+                vim.schedule(function()
+                  local ok, updated = pcall(vim.json.decode, fetch_out.stdout)
+                  if ok and type(updated) == "table" then
+                    local new_item = make_item(updated)
+                    for idx, i in ipairs(all_items) do
+                      if i.iid == item.iid and i.repo == item.repo then
+                        all_items[idx] = new_item
+                        break
+                      end
+                    end
+                  end
+                  vim.notify(action_label .. " #" .. item.iid .. ": " .. item.title, vim.log.levels.INFO)
+                  apply_filter(picker)
+                end)
+              end)
+            end)
+          end)
+        end,
         pick_repo = function(picker)
           local seen = {}
           local repos = {}
@@ -213,6 +252,7 @@ local function gitlab_issues()
         input = {
           keys = {
             ["<C-o>"] = { "view_issue", mode = { "i", "n" } },
+            ["<C-e>"] = { "assign_self", mode = { "i", "n" } },
             ["<C-f>"] = { "toggle_assignee", mode = { "i", "n" } },
             ["<C-g>"] = { "toggle_scope", mode = { "i", "n" } },
             ["<C-r>"] = { "pick_repo", mode = { "i", "n" } },
