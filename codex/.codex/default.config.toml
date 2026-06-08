@@ -2,7 +2,6 @@ model = "gpt-5.5"
 model_reasoning_effort = "medium"
 approval_policy = "on-request"
 approvals_reviewer = "user"
-sandbox_mode = "workspace-write"
 
 [features]
 terminal_resize_reflow = true
