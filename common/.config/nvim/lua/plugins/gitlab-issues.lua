@@ -155,7 +155,10 @@ local function gitlab_issues()
       layout = LAYOUT,
       items = compute_items(),
       format = function(item)
-        return { { item.text } }
+        if item.state == "closed" then
+          return { { "✓ ", "DiagnosticInfo" }, { item.text, "Comment" } }
+        end
+        return { { "○ ", "DiagnosticOk" }, { item.text } }
       end,
       preview = issue_preview,
       actions = {
