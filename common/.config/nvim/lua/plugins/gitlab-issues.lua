@@ -44,28 +44,47 @@ end
 -- ============================================================
 -- Picker: fetches all open group issues and opens the picker
 -- ============================================================
+-- Returns items matching all supplied criteria.
+-- A nil field means "no constraint on that dimension", so filter_items(items, {})
+-- returns everything. Adding a new filter dimension is one more `if` here and one
+-- more field in the opts table passed by compute_items().
+local function filter_items(items, opts)
+  return vim.tbl_filter(function(item)
+    if opts.repo and item.repo ~= opts.repo then
+      return false
+    end
+    if opts.assignee and not vim.tbl_contains(item.assignee_usernames, opts.assignee) then
+      return false
+    end
+    return true
+  end, items)
+end
+
 local function gitlab_issues()
+  -- Detect current repo synchronously (local git call, no async needed)
+  local origin = vim.trim(vim.fn.system("git remote get-url origin 2>/dev/null"))
+  local m = origin:match("gitlab%.verizon%.com[:/](.+)%.git$")
+  local scope_repo = (m and vim.startswith(m, "cnoe-automation/")) and m or nil
+
   -- Closure state
   local all_items = {}
   local assigned_only = false
+  local scope_filter = false
   local username = nil
 
-  -- Title reflects the current assignee filter
+  -- Title reflects active filters
   local function title_for()
-    if assigned_only then
-      return "GitLab Issues [cnoe-automation] (mine)"
-    end
-    return "GitLab Issues [cnoe-automation]"
+    local scope = scope_filter and (scope_repo:match("[^/]+$") or scope_repo) or "cnoe-automation"
+    local assignee = assigned_only and " (mine)" or ""
+    return "GitLab Issues [" .. scope .. "]" .. assignee
   end
 
-  -- Returns a filtered or unfiltered view of all_items
+  -- Maps current toggle state to filter criteria and delegates to filter_items
   local function compute_items()
-    if not assigned_only then
-      return all_items
-    end
-    return vim.tbl_filter(function(item)
-      return vim.tbl_contains(item.assignee_usernames, username)
-    end, all_items)
+    return filter_items(all_items, {
+      repo = scope_filter and scope_repo or nil,
+      assignee = assigned_only and username or nil,
+    })
   end
 
   -- Returns a comma-separated string of assignee display names (for the preview)
@@ -99,7 +118,7 @@ local function gitlab_issues()
   -- Builds a picker item from a raw issue object.
   -- Flattens the fields we care about so the preview and filters don't navigate nested tables.
   local function make_item(issue)
-    local repo = (issue.web_url or ""):match("gitlab%.verizon%.com/(.-)/-/issues")
+    local repo = issue.references and (issue.references.full or ""):match("(.+)#%d+") or ""
     return {
       text = string.format("#%-5d %s", issue.iid, issue.title),
       iid = issue.iid,
@@ -146,12 +165,23 @@ local function gitlab_issues()
           picker.title = title_for()
           picker:find({ refresh = true })
         end,
+        toggle_scope = function(picker)
+          if not scope_repo then
+            vim.notify("gitlab-issues: not in a cnoe-automation repo; scope filter unavailable", vim.log.levels.WARN)
+            return
+          end
+          scope_filter = not scope_filter
+          picker.opts.items = compute_items()
+          picker.title = title_for()
+          picker:find({ refresh = true })
+        end,
       },
       win = {
         input = {
           keys = {
             ["<C-o>"] = { "view_issue", mode = { "i", "n" } },
             ["<C-f>"] = { "toggle_assignee", mode = { "i", "n" } },
+            ["<C-g>"] = { "toggle_scope", mode = { "i", "n" } },
           },
         },
       },
