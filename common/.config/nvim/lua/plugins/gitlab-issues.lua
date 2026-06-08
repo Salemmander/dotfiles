@@ -64,27 +64,34 @@ local function gitlab_issues()
   -- Detect current repo synchronously (local git call, no async needed)
   local origin = vim.trim(vim.fn.system("git remote get-url origin 2>/dev/null"))
   local m = origin:match("gitlab%.verizon%.com[:/](.+)%.git$")
-  local scope_repo = (m and vim.startswith(m, "cnoe-automation/")) and m or nil
+  local detected_repo = (m and vim.startswith(m, "cnoe-automation/")) and m or nil
 
-  -- Closure state
+  -- Closure state: nil = no filter, string = filter to that repo
   local all_items = {}
   local assigned_only = false
-  local scope_filter = false
+  local repo_filter = nil
   local username = nil
 
   -- Title reflects active filters
   local function title_for()
-    local scope = scope_filter and (scope_repo:match("[^/]+$") or scope_repo) or "cnoe-automation"
+    local scope = repo_filter and (repo_filter:match("[^/]+$") or repo_filter) or "cnoe-automation"
     local assignee = assigned_only and " (mine)" or ""
     return "GitLab Issues [" .. scope .. "]" .. assignee
   end
 
-  -- Maps current toggle state to filter criteria and delegates to filter_items
+  -- Maps current state to filter criteria and delegates to filter_items
   local function compute_items()
     return filter_items(all_items, {
-      repo = scope_filter and scope_repo or nil,
+      repo = repo_filter,
       assignee = assigned_only and username or nil,
     })
+  end
+
+  -- Applies current filter state to the picker (called after any state change)
+  local function apply_filter(picker)
+    picker.opts.items = compute_items()
+    picker.title = title_for()
+    picker:find({ refresh = true })
   end
 
   -- Returns a comma-separated string of assignee display names (for the preview)
@@ -161,19 +168,42 @@ local function gitlab_issues()
             return
           end
           assigned_only = not assigned_only
-          picker.opts.items = compute_items()
-          picker.title = title_for()
-          picker:find({ refresh = true })
+          apply_filter(picker)
         end,
         toggle_scope = function(picker)
-          if not scope_repo then
+          if not detected_repo then
             vim.notify("gitlab-issues: not in a cnoe-automation repo; scope filter unavailable", vim.log.levels.WARN)
             return
           end
-          scope_filter = not scope_filter
-          picker.opts.items = compute_items()
-          picker.title = title_for()
-          picker:find({ refresh = true })
+          if repo_filter == detected_repo then
+            repo_filter = nil
+          else
+            repo_filter = detected_repo
+          end
+          apply_filter(picker)
+        end,
+        pick_repo = function(picker)
+          local seen = {}
+          local repos = {}
+          for _, item in ipairs(all_items) do
+            if item.repo ~= "" and not seen[item.repo] then
+              seen[item.repo] = true
+              table.insert(repos, item.repo)
+            end
+          end
+          table.sort(repos)
+          table.insert(repos, 1, "All repos")
+          vim.ui.select(repos, { prompt = "Filter by repo: " }, function(choice)
+            if not choice then
+              return
+            end
+            if choice == "All repos" then
+              repo_filter = nil
+            else
+              repo_filter = choice
+            end
+            apply_filter(picker)
+          end)
         end,
       },
       win = {
@@ -182,6 +212,7 @@ local function gitlab_issues()
             ["<C-o>"] = { "view_issue", mode = { "i", "n" } },
             ["<C-f>"] = { "toggle_assignee", mode = { "i", "n" } },
             ["<C-g>"] = { "toggle_scope", mode = { "i", "n" } },
+            ["<C-r>"] = { "pick_repo", mode = { "i", "n" } },
           },
         },
       },
