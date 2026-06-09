@@ -15,6 +15,8 @@ local LAYOUT = {
   },
 }
 
+local GROUP = "cnoe-automation"
+
 -- ============================================================
 -- Preview: renders issue fields as markdown in the preview pane
 -- ============================================================
@@ -76,7 +78,7 @@ local function fetch_all_repos(callback)
   end
   local accumulated = {}
   local function fetch_page(page)
-    local url = "groups/cnoe-automation/projects?include_subgroups=true&per_page=100&page=" .. page
+    local url = "groups/" .. GROUP .. "/projects?include_subgroups=true&per_page=100&page=" .. page
     vim.system({ "glab", "api", url }, { text = true }, function(out)
       vim.schedule(function()
         local ok, projects = pcall(vim.json.decode, out.stdout)
@@ -124,7 +126,7 @@ local function run_create_issue(detected_repo, on_success)
       table.insert(all_repos, 1, detected_repo)
     end
     if #all_repos == 0 then
-      vim.notify("gitlab-issues: no repos found in cnoe-automation", vim.log.levels.WARN)
+      vim.notify("gitlab-issues: no repos found in " .. GROUP, vim.log.levels.WARN)
       return
     end
 
@@ -176,22 +178,23 @@ local function run_create_issue(detected_repo, on_success)
   end)
 end
 
-local function gitlab_issues()
+local function gitlab_issues(opts)
+  opts = opts or {}
   -- Detect current repo synchronously (local git call, no async needed)
   local origin = vim.trim(vim.fn.system("git remote get-url origin 2>/dev/null"))
   local m = origin:match("gitlab%.verizon%.com[:/](.+)%.git$")
-  local detected_repo = (m and vim.startswith(m, "cnoe-automation/")) and m or nil
+  local detected_repo = (m and vim.startswith(m, GROUP .. "/")) and m or nil
 
   -- Closure state: nil = no filter, string = filter to that repo
   local all_items = {}
   local assigned_only = false
   local repo_filter = nil
-  local state_filter = nil -- nil = all, "opened" = open only, "closed" = closed only
+  local state_filter = opts.state or nil -- nil = all, "opened" = open only, "closed" = closed only
   local username = nil
 
   -- Title reflects active filters
   local function title_for()
-    local scope = repo_filter and (repo_filter:match("[^/]+$") or repo_filter) or "cnoe-automation"
+    local scope = repo_filter and (repo_filter:match("[^/]+$") or repo_filter) or GROUP
     local assignee = assigned_only and " (mine)" or ""
     local state = state_filter and " [" .. state_filter .. "]" or ""
     return "GitLab Issues [" .. scope .. "]" .. assignee .. state
@@ -294,7 +297,7 @@ local function gitlab_issues()
         end,
         toggle_scope = function(picker)
           if not detected_repo then
-            vim.notify("gitlab-issues: not in a cnoe-automation repo; scope filter unavailable", vim.log.levels.WARN)
+            vim.notify("gitlab-issues: not in a " .. GROUP .. " repo; scope filter unavailable", vim.log.levels.WARN)
             return
           end
           if repo_filter == detected_repo then
@@ -355,7 +358,7 @@ local function gitlab_issues()
         end,
         create_issue = function(picker)
           run_create_issue(detected_repo, function()
-            local fetch_cmd = { "glab", "issue", "list", "-g", "cnoe-automation", "-O", "json", "--all" }
+            local fetch_cmd = { "glab", "issue", "list", "-g", GROUP, "-O", "json", "--all" }
             vim.system(fetch_cmd, { text = true }, function(fetch_out)
               vim.schedule(function()
                 local ok, issues = pcall(vim.json.decode, fetch_out.stdout)
@@ -430,7 +433,7 @@ local function gitlab_issues()
 
   -- Fetch all open issues in the cnoe-automation group.
   -- Fatal: if this fails, suppress the picker by pinning pending to math.huge.
-  local cmd = { "glab", "issue", "list", "-g", "cnoe-automation", "-O", "json", "--all" }
+  local cmd = { "glab", "issue", "list", "-g", GROUP, "-O", "json", "--all" }
   vim.system(cmd, { text = true }, function(out)
     vim.schedule(function()
       local ok, issues = pcall(vim.json.decode, out.stdout)
@@ -451,7 +454,7 @@ end
 local function gitlab_create_issue()
   local origin = vim.trim(vim.fn.system("git remote get-url origin 2>/dev/null"))
   local m = origin:match("gitlab%.verizon%.com[:/](.+)%.git$")
-  local detected_repo = (m and vim.startswith(m, "cnoe-automation/")) and m or nil
+  local detected_repo = (m and vim.startswith(m, GROUP .. "/")) and m or nil
   run_create_issue(detected_repo, function() end)
 end
 
@@ -459,7 +462,14 @@ return {
   {
     "folke/snacks.nvim",
     keys = {
-      { "<leader>GI", gitlab_issues, desc = "GitLab Issues (cnoe-automation)" },
+      { "<leader>GI", gitlab_issues, desc = "GitLab Issues - all" },
+      {
+        "<leader>Gi",
+        function()
+          gitlab_issues({ state = "opened" })
+        end,
+        desc = "GitLab Issues - open",
+      },
       { "<leader>Gc", gitlab_create_issue, desc = "GitLab Create Issue" },
     },
   },
