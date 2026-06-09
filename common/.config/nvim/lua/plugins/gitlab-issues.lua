@@ -63,6 +63,36 @@ local function filter_items(items, opts)
   end, items)
 end
 
+-- Fetches all projects in cnoe-automation, handling pagination.
+-- Calls callback(repos, nil) on success or callback(nil, err_msg) on failure.
+-- repos is a sorted list of path_with_namespace strings.
+local function fetch_all_repos(callback)
+  local accumulated = {}
+  local function fetch_page(page)
+    local url = "groups/cnoe-automation/projects?include_subgroups=true&per_page=100&page=" .. page
+    vim.system({ "glab", "api", url }, { text = true }, function(out)
+      vim.schedule(function()
+        local ok, projects = pcall(vim.json.decode, out.stdout)
+        if not ok or type(projects) ~= "table" then
+          callback(nil, out.stderr or "failed to fetch repos")
+          return
+        end
+        for _, p in ipairs(projects) do
+          if type(p.path_with_namespace) == "string" then
+            table.insert(accumulated, p.path_with_namespace)
+          end
+        end
+        if #projects == 100 then
+          fetch_page(page + 1)
+        else
+          callback(accumulated)
+        end
+      end)
+    end)
+  end
+  fetch_page(1)
+end
+
 local function gitlab_issues()
   -- Detect current repo synchronously (local git call, no async needed)
   local origin = vim.trim(vim.fn.system("git remote get-url origin 2>/dev/null"))
@@ -240,6 +270,87 @@ local function gitlab_issues()
             end)
           end)
         end,
+        create_issue = function(picker)
+          vim.notify("Fetching repos...", vim.log.levels.INFO)
+          fetch_all_repos(function(all_repos, err)
+            if err then
+              vim.notify("gitlab-issues: " .. err, vim.log.levels.ERROR)
+              return
+            end
+            table.sort(all_repos)
+            if detected_repo then
+              for i, r in ipairs(all_repos) do
+                if r == detected_repo then
+                  table.remove(all_repos, i)
+                  break
+                end
+              end
+              table.insert(all_repos, 1, detected_repo)
+            end
+            if #all_repos == 0 then
+              vim.notify("gitlab-issues: no repos found in cnoe-automation", vim.log.levels.WARN)
+              return
+            end
+
+            local chosen_repo, chosen_title
+            local on_desc, on_title, on_repo
+
+            on_desc = function(desc)
+              local cmd = {
+                "glab",
+                "issue",
+                "create",
+                "-R",
+                chosen_repo,
+                "--title",
+                chosen_title,
+                "--description",
+                desc or "",
+              }
+              vim.notify("Creating issue in " .. chosen_repo .. "...", vim.log.levels.INFO)
+              vim.system(cmd, { text = true }, function(out)
+                vim.schedule(function()
+                  if out.code ~= 0 then
+                    vim.notify("gitlab-issues: " .. (out.stderr or "create failed"), vim.log.levels.ERROR)
+                    return
+                  end
+                  vim.notify("Issue created: " .. vim.trim(out.stdout), vim.log.levels.INFO)
+                  local fetch_cmd = { "glab", "issue", "list", "-g", "cnoe-automation", "-O", "json", "--all" }
+                  vim.system(fetch_cmd, { text = true }, function(fetch_out)
+                    vim.schedule(function()
+                      local ok, issues = pcall(vim.json.decode, fetch_out.stdout)
+                      if ok and type(issues) == "table" then
+                        all_items = {}
+                        for _, issue in ipairs(issues) do
+                          table.insert(all_items, make_item(issue))
+                        end
+                        apply_filter(picker)
+                      end
+                    end)
+                  end)
+                end)
+              end)
+            end
+
+            on_title = function(title)
+              if not title or vim.trim(title) == "" then
+                return
+              end
+              chosen_title = title
+              vim.ui.input({ prompt = "Description (optional): " }, on_desc)
+            end
+
+            on_repo = function(repo)
+              if not repo then
+                return
+              end
+              chosen_repo = repo
+              vim.ui.input({ prompt = "Title: " }, on_title)
+            end
+
+            vim.ui.select(all_repos, { prompt = "Create issue in repo: " }, on_repo)
+          end)
+        end,
         pick_repo = function(picker)
           local seen = {}
           local repos = {}
@@ -273,6 +384,7 @@ local function gitlab_issues()
             ["<C-g>"] = { "toggle_scope", mode = { "i", "n" } },
             ["<C-s>"] = { "toggle_state", mode = { "i", "n" } },
             ["<C-r>"] = { "pick_repo", mode = { "i", "n" } },
+            ["<C-t>"] = { "create_issue", mode = { "i", "n" } },
           },
         },
       },
