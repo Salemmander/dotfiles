@@ -1,3 +1,21 @@
+local KEYS = {
+  { key = "<C-o>", action = "view_issue", desc = "open" },
+  { key = "<C-e>", action = "assign_self", desc = "assign" },
+  { key = "<C-f>", action = "toggle_assignee", desc = "mine" },
+  { key = "<C-g>", action = "toggle_scope", desc = "scope" },
+  { key = "<C-s>", action = "toggle_state", desc = "state" },
+  { key = "<C-r>", action = "pick_repo", desc = "repo" },
+  { key = "<C-t>", action = "create_issue", desc = "new" },
+}
+
+local FOOTER = table.concat(
+  vim.tbl_map(function(k)
+    local letter = k.key:match("<C%-(.-)>")
+    return "^" .. letter .. " " .. k.desc
+  end, KEYS),
+  "  "
+)
+
 -- ============================================================
 -- Layout: vertical split, list on top, preview on bottom
 -- ============================================================
@@ -9,6 +27,8 @@ local LAYOUT = {
     border = true,
     title = "{title} {live} {flags}",
     title_pos = "center",
+    footer = FOOTER,
+    footer_pos = "center",
     { win = "input", height = 1, border = "bottom" },
     { win = "list", border = "none" },
     { win = "preview", title = "{preview}", height = 0.7, border = "top" },
@@ -399,15 +419,13 @@ local function gitlab_issues(opts)
       },
       win = {
         input = {
-          keys = {
-            ["<C-o>"] = { "view_issue", mode = { "i", "n" } },
-            ["<C-e>"] = { "assign_self", mode = { "i", "n" } },
-            ["<C-f>"] = { "toggle_assignee", mode = { "i", "n" } },
-            ["<C-g>"] = { "toggle_scope", mode = { "i", "n" } },
-            ["<C-s>"] = { "toggle_state", mode = { "i", "n" } },
-            ["<C-r>"] = { "pick_repo", mode = { "i", "n" } },
-            ["<C-t>"] = { "create_issue", mode = { "i", "n" } },
-          },
+          keys = (function()
+            local k = {}
+            for _, entry in ipairs(KEYS) do
+              k[entry.key] = { entry.action, mode = { "i", "n" } }
+            end
+            return k
+          end)(),
         },
       },
     })
