@@ -470,7 +470,7 @@ return {
         end,
         desc = "GitLab Issues - open",
       },
-      { "<leader>Gc", gitlab_create_issue, desc = "GitLab Create Issue" },
+      { "<leader>GC", gitlab_create_issue, desc = "GitLab Create Issue" },
     },
   },
   {
