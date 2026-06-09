@@ -7,6 +7,7 @@ local KEYS = {
   { key = "<C-r>", action = "pick_repo", desc = "repo" },
   { key = "<C-t>", action = "create_issue", desc = "new" },
   { key = "<C-x>", action = "close_reopen", desc = "close/open" },
+  { key = "<C-b>", action = "add_comment", desc = "comment" },
 }
 
 local FOOTER = table.concat(
@@ -376,6 +377,57 @@ local function gitlab_issues(opts)
               end)
             end)
           end)
+        end,
+        add_comment = function(_, item)
+          local buf = vim.api.nvim_create_buf(false, true)
+          vim.bo[buf].filetype = "markdown"
+          vim.bo[buf].bufhidden = "wipe"
+          local width = math.floor(vim.o.columns * 0.6)
+          local height = 15
+          local row = math.floor((vim.o.lines - height) / 2)
+          local col = math.floor((vim.o.columns - width) / 2)
+          local win = vim.api.nvim_open_win(buf, true, {
+            relative = "editor",
+            width = width,
+            height = height,
+            row = row,
+            col = col,
+            style = "minimal",
+            border = "rounded",
+            title = " Comment on #" .. item.iid .. ": " .. item.title .. " ",
+            title_pos = "center",
+            footer = " <C-s> submit  ·  <Esc> cancel ",
+            footer_pos = "center",
+            zindex = 250,
+          })
+          vim.cmd("startinsert")
+          local function close()
+            if vim.api.nvim_win_is_valid(win) then
+              vim.api.nvim_win_close(win, true)
+            end
+          end
+          local function submit()
+            local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+            local content = vim.trim(table.concat(lines, "\n"))
+            if content == "" then
+              vim.notify("gitlab-issues: comment is empty", vim.log.levels.WARN)
+              return
+            end
+            close()
+            vim.notify("Posting comment on #" .. item.iid .. "...", vim.log.levels.INFO)
+            local cmd = { "glab", "issue", "note", tostring(item.iid), "-R", item.repo, "-m", content }
+            vim.system(cmd, { text = true }, function(out)
+              vim.schedule(function()
+                if out.code ~= 0 then
+                  vim.notify("gitlab-issues: " .. (out.stderr or "comment failed"), vim.log.levels.ERROR)
+                  return
+                end
+                vim.notify("Comment posted on #" .. item.iid .. ": " .. item.title, vim.log.levels.INFO)
+              end)
+            end)
+          end
+          vim.keymap.set({ "n", "i" }, "<C-s>", submit, { buffer = buf })
+          vim.keymap.set({ "n", "i" }, "<Esc>", close, { buffer = buf })
         end,
         close_reopen = function(picker, item)
           local is_open = item.state == "opened"
