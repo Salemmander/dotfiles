@@ -56,6 +56,9 @@ local function filter_items(items, opts)
     if opts.assignee and not vim.tbl_contains(item.assignee_usernames, opts.assignee) then
       return false
     end
+    if opts.state and item.state ~= opts.state then
+      return false
+    end
     return true
   end, items)
 end
@@ -70,13 +73,15 @@ local function gitlab_issues()
   local all_items = {}
   local assigned_only = false
   local repo_filter = nil
+  local state_filter = nil -- nil = all, "opened" = open only, "closed" = closed only
   local username = nil
 
   -- Title reflects active filters
   local function title_for()
     local scope = repo_filter and (repo_filter:match("[^/]+$") or repo_filter) or "cnoe-automation"
     local assignee = assigned_only and " (mine)" or ""
-    return "GitLab Issues [" .. scope .. "]" .. assignee
+    local state = state_filter and " [" .. state_filter .. "]" or ""
+    return "GitLab Issues [" .. scope .. "]" .. assignee .. state
   end
 
   -- Maps current state to filter criteria and delegates to filter_items
@@ -84,6 +89,7 @@ local function gitlab_issues()
     return filter_items(all_items, {
       repo = repo_filter,
       assignee = assigned_only and username or nil,
+      state = state_filter,
     })
   end
 
@@ -185,6 +191,16 @@ local function gitlab_issues()
           end
           apply_filter(picker)
         end,
+        toggle_state = function(picker)
+          if state_filter == nil then
+            state_filter = "opened"
+          elseif state_filter == "opened" then
+            state_filter = "closed"
+          else
+            state_filter = nil
+          end
+          apply_filter(picker)
+        end,
         assign_self = function(picker, item)
           if not username then
             vim.notify("gitlab-issues: GitLab username unavailable", vim.log.levels.WARN)
@@ -255,6 +271,7 @@ local function gitlab_issues()
             ["<C-e>"] = { "assign_self", mode = { "i", "n" } },
             ["<C-f>"] = { "toggle_assignee", mode = { "i", "n" } },
             ["<C-g>"] = { "toggle_scope", mode = { "i", "n" } },
+            ["<C-s>"] = { "toggle_state", mode = { "i", "n" } },
             ["<C-r>"] = { "pick_repo", mode = { "i", "n" } },
           },
         },
