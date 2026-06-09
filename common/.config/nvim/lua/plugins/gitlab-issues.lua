@@ -6,6 +6,7 @@ local KEYS = {
   { key = "<C-s>", action = "toggle_state", desc = "state" },
   { key = "<C-r>", action = "pick_repo", desc = "repo" },
   { key = "<C-t>", action = "create_issue", desc = "new" },
+  { key = "<C-x>", action = "close_reopen", desc = "close/open" },
 }
 
 local FOOTER = table.concat(
@@ -371,6 +372,47 @@ local function gitlab_issues(opts)
                   end
                   vim.notify(action_label .. " #" .. item.iid .. ": " .. item.title, vim.log.levels.INFO)
                   apply_filter(picker)
+                end)
+              end)
+            end)
+          end)
+        end,
+        close_reopen = function(picker, item)
+          local is_open = item.state == "opened"
+          local action_word = is_open and "Close" or "Reopen"
+          local cmd_verb = is_open and "close" or "reopen"
+          local done_label = is_open and "Closed" or "Reopened"
+          vim.ui.select({ "No", "Yes" }, {
+            prompt = action_word .. " #" .. item.iid .. ": " .. item.title .. "?",
+          }, function(choice)
+            if choice ~= "Yes" then
+              return
+            end
+            vim.notify(action_word .. "ing #" .. item.iid .. "...", vim.log.levels.INFO)
+            local cmd = { "glab", "issue", cmd_verb, tostring(item.iid), "-R", item.repo }
+            vim.system(cmd, { text = true }, function(out)
+              vim.schedule(function()
+                if out.code ~= 0 then
+                  vim.notify("gitlab-issues: " .. (out.stderr or cmd_verb .. " failed"), vim.log.levels.ERROR)
+                  return
+                end
+                local encoded_repo = item.repo:gsub("/", "%%2F")
+                local api_path = "projects/" .. encoded_repo .. "/issues/" .. tostring(item.iid)
+                vim.system({ "glab", "api", api_path }, { text = true }, function(fetch_out)
+                  vim.schedule(function()
+                    local ok, updated = pcall(vim.json.decode, fetch_out.stdout)
+                    if ok and type(updated) == "table" then
+                      local new_item = make_item(updated)
+                      for idx, i in ipairs(all_items) do
+                        if i.iid == item.iid and i.repo == item.repo then
+                          all_items[idx] = new_item
+                          break
+                        end
+                      end
+                    end
+                    vim.notify(done_label .. " #" .. item.iid .. ": " .. item.title, vim.log.levels.INFO)
+                    apply_filter(picker)
+                  end)
                 end)
               end)
             end)
