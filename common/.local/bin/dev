@@ -1,6 +1,32 @@
 #!/bin/zsh
-# Open a dev session: claude on the left, terminal on the right
-# Usage: dev [directory]
+# Open a dev session: AI agent on the left, terminal on the right
+# Usage: dev [--claude|--codex] [directory]
+
+AGENT="${DEV_AGENT:-claude}"
+
+case "$1" in
+    --claude|claude) AGENT="claude"; shift ;;
+    --codex|codex) AGENT="codex"; shift ;;
+    -h|--help)
+        echo "Usage: dev [--claude|--codex] [directory]"
+        echo "Set DEV_AGENT=claude or DEV_AGENT=codex in ~/.zshrc.local to choose the default."
+        exit 0
+        ;;
+esac
+
+case "$AGENT" in
+    claude) AGENT_COMMAND="claude --continue 2>/dev/null || claude" ;;
+    codex) AGENT_COMMAND="codex resume --last 2>/dev/null || codex" ;;
+    *)
+        echo "dev: unsupported DEV_AGENT '$AGENT' (expected claude or codex)" >&2
+        exit 1
+        ;;
+esac
+
+if ! command -v "$AGENT" >/dev/null 2>&1; then
+    echo "dev: $AGENT is not available in PATH" >&2
+    exit 1
+fi
 
 DIR="${1:-.}"
 DIR="$(cd "$DIR" && pwd)"
@@ -21,10 +47,10 @@ if tmux has-session -t "$SESSION" 2>/dev/null; then
     exit 0
 fi
 
-# Create session: left pane for claude, right pane for terminal
+# Create session: left pane for agent, right pane for terminal
 tmux new-session -d -s "$SESSION" -c "$DIR"
 tmux split-window -h -t "$SESSION" -c "$DIR"
-tmux send-keys -t "$SESSION:.1" "claude --continue 2>/dev/null || claude" Enter
+tmux send-keys -t "$SESSION:.1" "$AGENT_COMMAND" Enter
 tmux select-pane -t "$SESSION:.1"
 
 connect
