@@ -11,6 +11,7 @@ ContinuationIndentWidth: 4
 
 # Braces and wrapping
 BreakBeforeBraces: Attach
+BreakTemplateDeclarations: Yes
 BreakBeforeBinaryOperators: None
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeColon
