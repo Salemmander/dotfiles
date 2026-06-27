@@ -32,6 +32,10 @@ export EDITOR=nvim
 bindkey -v
 KEYTIMEOUT=1
 
+shift-space() { LBUFFER+=" " }
+zle -N shift-space
+bindkey -M viins $'\e[32;2u' shift-space
+
 zle-keymap-select() {
   if [[ $KEYMAP == vicmd ]]; then
     echo -ne '\e[1 q'
@@ -69,4 +73,3 @@ if [[ -o interactive ]]; then
   eval "$(zoxide init --cmd cd zsh)"
 fi
 eval "$(starship init zsh)"
-
