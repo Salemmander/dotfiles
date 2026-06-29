@@ -1,5 +1,9 @@
 autoload -Uz compinit
-compinit
+if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
 
 export PATH="$HOME/.local/share/nvim/mason/bin:$HOME/.local/bin:$PATH"
 

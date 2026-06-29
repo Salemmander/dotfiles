@@ -29,6 +29,7 @@
     ],
     "defaultMode": "default"
   },
+  "model": "opusplan",
   "hooks": {
     "PostToolUse": [
       {
@@ -59,7 +60,8 @@
   "enabledPlugins": {
     "clangd-lsp@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
-    "lua-lsp@claude-plugins-official": true
+    "lua-lsp@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -69,6 +71,5 @@
       }
     }
   },
-  "effortLevel": "medium",
-  "model": "opusplan"
+  "effortLevel": "medium"
 }
