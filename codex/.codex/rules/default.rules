@@ -69,3 +69,4 @@ prefix_rule(
     decision = "prompt",
     justification = "Deleting tasks is destructive and should be confirmed.",
 )
+prefix_rule(pattern=["gh", "issue", "create"], decision="allow")
