@@ -1,15 +1,16 @@
 #!/bin/zsh
 # Open a dev session: AI agent on the left, terminal on the right
-# Usage: dev [--claude|--codex] [directory]
+# Usage: dev [--claude|--codex|--grok] [directory]
 
 AGENT="${DEV_AGENT:-claude}"
 
 case "$1" in
     --claude|claude) AGENT="claude"; shift ;;
     --codex|codex) AGENT="codex"; shift ;;
+    --grok|grok) AGENT="grok"; shift ;;
     -h|--help)
-        echo "Usage: dev [--claude|--codex] [directory]"
-        echo "Set DEV_AGENT=claude or DEV_AGENT=codex in ~/.zshrc.local to choose the default."
+        echo "Usage: dev [--claude|--codex|--grok] [directory]"
+        echo "Set DEV_AGENT=claude, codex, or grok in ~/.zshrc.local to choose the default."
         exit 0
         ;;
 esac
@@ -17,8 +18,9 @@ esac
 case "$AGENT" in
     claude) AGENT_COMMAND="claude --continue 2>/dev/null || claude" ;;
     codex) AGENT_COMMAND="codex resume --last 2>/dev/null || codex" ;;
+    grok) AGENT_COMMAND="grok --continue 2>/dev/null || grok" ;;
     *)
-        echo "dev: unsupported DEV_AGENT '$AGENT' (expected claude or codex)" >&2
+        echo "dev: unsupported DEV_AGENT '$AGENT' (expected claude, codex, or grok)" >&2
         exit 1
         ;;
 esac
