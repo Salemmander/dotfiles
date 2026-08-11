@@ -18,7 +18,7 @@ esac
 case "$AGENT" in
     claude) AGENT_COMMAND="claude --continue 2>/dev/null || claude" ;;
     codex) AGENT_COMMAND="codex resume --last 2>/dev/null || codex" ;;
-    grok) AGENT_COMMAND="grok --continue 2>/dev/null || grok" ;;
+    grok) AGENT_COMMAND="grok --continue || grok" ;;
     *)
         echo "dev: unsupported DEV_AGENT '$AGENT' (expected claude, codex, or grok)" >&2
         exit 1
