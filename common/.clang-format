@@ -42,7 +42,7 @@ AccessModifierOffset: -4
 IndentAccessModifiers: false
 NamespaceIndentation: None
 CompactNamespaces: false
-IndentCaseLabels: false
+IndentCaseLabels: true
 
 # Includes
 SortIncludes: CaseSensitive

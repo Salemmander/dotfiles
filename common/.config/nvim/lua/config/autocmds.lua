@@ -27,5 +27,8 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.shiftwidth = 4
     vim.opt_local.tabstop = 4
     vim.opt_local.softtabstop = 4
+    -- Keep // continuation. Do not treat /* */ as a three-piece comment, or
+    -- Enter inserts '*' (or '*/' if the end marker is a leftover leader).
+    vim.opt_local.comments = { ":///", "://" }
   end,
 })
