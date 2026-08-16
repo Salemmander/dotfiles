@@ -40,7 +40,7 @@ ReferenceAlignment: Left
 # Classes, namespaces, and switches
 AccessModifierOffset: -4
 IndentAccessModifiers: false
-NamespaceIndentation: None
+NamespaceIndentation: All
 CompactNamespaces: false
 IndentCaseLabels: true
 
