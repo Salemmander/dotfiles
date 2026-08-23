@@ -58,7 +58,7 @@ echo
 echo "=== Installation Complete ==="
 echo
 echo "Deploy configs with stow:"
-echo "  stow -t ~ common hyprland claude"
+echo "  stow -t ~ common omarchy claude"
 echo
 echo "After deploying, open tmux and press prefix + I to install plugins."
 echo

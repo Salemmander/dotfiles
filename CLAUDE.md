@@ -10,7 +10,7 @@ This is a personal dotfiles repository managed with GNU Stow. Configuration file
 
 - `common/` - Cross-platform configs (zsh, nvim, tmux, starship)
 - `mac/` - macOS-specific configs (ghostty terminal, nvim theme)
-- `hyprland/` - Hyprland window manager configs (Linux)
+- `omarchy/` - Omarchy/Hyprland user overrides (Linux)
 
 ## Stow Usage
 

@@ -145,45 +145,22 @@ stow -t ~ bash
 
 ---
 
-## hyprland/
+## omarchy/
 
-Shared Hyprland configuration used on all Linux machines (laptop + desktop).
-
-**Contents:**
-
-- `.config/hypr/bindings.conf` - Custom keybindings, application launchers, and webapp shortcuts (user overrides for Omarchy defaults)
-
-**Install dependencies:**
-
-```bash
-# Arch Linux
-sudo pacman -S hyprland
-```
-
-**Deploy (all machines):**
-
-```bash
-stow -t ~ hyprland
-```
-
----
-
-## hyprland-laptop/
-
-Laptop-specific Hyprland configuration. Contains monitor layout, clamshell mode, lid handling, and hardware-specific autostart. **Only stow this on the laptop.**
+Omarchy (Hyprland) user overrides. Does not replace packaged Omarchy defaults — only the files you customized.
 
 **Contents:**
 
-- `.config/hypr/monitors.conf` - Monitor layout, workspace pinning, and lid switch bindings
-- `.config/hypr/autostart.conf` - Laptop-only autostart commands
-- `.config/hypr/scripts/lid-close.sh` - Disable internal display / suspend on lid close
-- `.config/hypr/scripts/lid-open.sh` - Restore internal display on lid open
+- `.config/hypr/monitors.lua` - Dual Acer 27" layout
+- `.config/hypr/hyprland.lua` - Workspace pinning (right 1-5, left 6-10)
+- `.config/hypr/bindings.lua` - Per-monitor Super+1-5, Super+H/L monitor focus
+- `.config/hypr/autostart.lua` / `hyprsunset.conf` - Night light 20:00-07:00
+- `.config/hypr/input.lua` - Caps as Ctrl, mouse feel
+- `.config/omarchy/shell.json` - Bar layout
+- `.config/omarchy/plugins/salem.workspaces/` - Dual-monitor workspace bar widget
 
-**Deploy (laptop only):**
+**Deploy:**
 
 ```bash
-stow -t ~ hyprland
-stow -t ~ hyprland-laptop
+stow -t ~ omarchy
 ```
-
-**On desktop machines:** Only run `stow hyprland`. The laptop-specific files will not exist.
