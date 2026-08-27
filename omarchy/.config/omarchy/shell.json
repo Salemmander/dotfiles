@@ -7,7 +7,7 @@
           "id": "omarchy.indicators"
         },
         {
-          "format": "dddd h:mm AP",
+          "format": "dddd MMM d h:mm AP",
           "id": "omarchy.clock",
           "verticalFormat": "h\n—\nmm\nAP"
         },
@@ -57,7 +57,7 @@
       ]
     },
     "position": "top",
-    "transparent": true
+    "transparent": false
   },
   "idle": {
     "lock": 300,

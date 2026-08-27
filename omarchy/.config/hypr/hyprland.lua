@@ -68,3 +68,27 @@ o.window(".*[Bb]lack.*[Oo]ps.*3.*", {
   opacity = "1 1",
 })
 o.window({ title = ".*[Bb]lack.*[Oo]ps.*3.*" }, { allows_input = true })
+
+-- Zoom (XWayland): hovering the meeting spawns extra windows (toolbar,
+-- tooltips, menus). follow_mouse focuses them, Zoom thinks the cursor
+-- left, destroys the popup, and the tiled meeting resizes in a loop.
+-- Keep the main meeting/home windows tiled; float everything else.
+o.window({
+  class = "^zoom$",
+  title = "negative:^(Meeting|Zoom Meeting|Zoom Workplace)$",
+}, {
+  float = true,
+  no_anim = true,
+  no_initial_focus = true,
+  no_follow_mouse = true,
+  allows_input = true,
+})
+o.window({ class = "^zoom$", title = "^(annotate_toolbar|as_toolbar)$" }, {
+  float = true,
+  no_anim = true,
+  no_initial_focus = true,
+  no_follow_mouse = true,
+  allows_input = true,
+  size = { 900, 80 },
+})
+o.window("zoom", { no_anim = true })
