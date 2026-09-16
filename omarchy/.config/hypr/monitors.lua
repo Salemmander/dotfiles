@@ -13,11 +13,13 @@ hl.monitor({
 
 -- Right: Acer VG272U 27" 1440p. `preferred` is 59.95Hz; 143.86 is the 144Hz mode.
 -- vrr = 2 is adaptive sync in fullscreen only.
+-- Same physical size as the 1080p VG270, so scale 4/3 keeps native 2560x1440
+-- while matching text/bar size (logical 1920x1080).
 hl.monitor({
   output = "desc:Acer Technologies VG272U",
   mode = "2560x1440@143.86",
   position = "1920x0",
-  scale = 1,
+  scale = 4 / 3,
   vrr = 2,
 })
 

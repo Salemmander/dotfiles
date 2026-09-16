@@ -27,11 +27,27 @@
         },
         {
           "id": "salem.workspaces"
+        },
+        {
+          "id": "crmne.omastats",
+          "cpuStyle": "text",
+          "tabs": "cpu,memory,disks,network,sensors,battery",
+          "barLabels": "icon",
+          "temperatureUnit": "Celsius",
+          "modules": "cpu,gpu,memory",
+          "barSensors": "cpu,gpu",
+          "memoryStyle": "text",
+          "gpuStyle": "text",
+          "showCores": true,
+          "showProcesses": true
         }
       ],
       "right": [
         {
           "id": "omarchy.tray"
+        },
+        {
+          "id": "salem.minecraft"
         },
         {
           "id": "omarchy.tailscale"
