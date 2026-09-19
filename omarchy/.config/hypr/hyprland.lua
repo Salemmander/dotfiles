@@ -22,36 +22,14 @@ require("hypr.bindings")
 require("hypr.looknfeel")
 require("hypr.autostart")
 
+-- Dual-monitor workspace pins + Super+H/L from the `pc` stow package.
+pcall(require, "hypr.workspaces")
+
 -- Toggle config flags dynamically.
 require("default.hypr.toggles")
 
 -- Add any other personal Hyprland configuration below.
 -- o.window("qemu", { workspace = "5" })
-
--- Pin workspaces to monitors so Super+N cannot create/steal a workspace on
--- whichever screen happens to be focused.
--- Right VG272U (primary): 1-5. Left VG270 (secondary): 6-10.
-local primary = "desc:Acer Technologies VG272U"
-local secondary = "desc:Acer Technologies VG270"
-
-for i = 1, 5 do
-  hl.workspace_rule({
-    workspace = tostring(i),
-    monitor = primary,
-    persistent = true,
-    default = (i == 1),
-  })
-end
-
-for i = 6, 10 do
-  hl.workspace_rule({
-    workspace = tostring(i),
-    monitor = secondary,
-    persistent = true,
-    default = (i == 6),
-  })
-end
-
 
 -- Bitwarden Brave extension popup. Omarchy only covers the chrome- class;
 -- float/center only — no size override so the extension keeps its natural size.

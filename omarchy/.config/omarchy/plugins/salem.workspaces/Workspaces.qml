@@ -4,10 +4,15 @@ import Quickshell.Hyprland
 import qs.Commons
 import qs.Ui
 
-// Left group is workspaces 6-10, right group is 1-5. Both labeled 1-5.
 BarWidget {
   id: root
   moduleName: "omarchy.workspaces"
+
+  readonly property bool dual: Hyprland.monitors && Hyprland.monitors.values.length >= 2
+  readonly property int focusedId: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 0
+  readonly property bool leftActive: focusedId >= 6
+  readonly property bool rightActive: focusedId >= 1 && focusedId <= 5
+  readonly property real trailingGap: root.vertical ? 0 : Style.spaceReal(1.5)
 
   function workspaceById(id) {
     var values = Hyprland.workspaces.values
@@ -15,6 +20,17 @@ BarWidget {
       if (values[i].id === id) return values[i]
     }
     return null
+  }
+
+  function workspaceIds() {
+    var ids = [1, 2, 3, 4, 5]
+    var values = Hyprland.workspaces.values
+    for (var i = 0; i < values.length; i++) {
+      var id = values[i].id
+      if (id > 0 && id <= 10 && ids.indexOf(id) === -1) ids.push(id)
+    }
+    ids.sort(function(left, right) { return left - right })
+    return ids
   }
 
   function focusWorkspace(id) {
@@ -41,16 +57,43 @@ BarWidget {
     onPressed: function() { root.focusWorkspace(workspaceId) }
   }
 
-  readonly property int focusedId: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 0
-  readonly property bool leftActive: focusedId >= 6
-  readonly property bool rightActive: focusedId >= 1 && focusedId <= 5
-  readonly property real trailingGap: root.vertical ? 0 : Style.spaceReal(1.5)
+  implicitWidth: (root.dual ? dualRow.implicitWidth : singleGrid.implicitWidth) + trailingGap
+  implicitHeight: root.dual ? dualRow.implicitHeight : singleGrid.implicitHeight
 
-  implicitWidth: row.implicitWidth + trailingGap
-  implicitHeight: row.implicitHeight
+  GridLayout {
+    id: singleGrid
+    visible: !root.dual
+    anchors.fill: parent
+    anchors.rightMargin: root.trailingGap
+    columns: root.vertical ? 1 : root.workspaceIds().length
+    columnSpacing: root.vertical ? 0 : Style.space(1)
+    rowSpacing: root.vertical ? Style.space(2) : 0
+
+    Repeater {
+      model: root.workspaceIds()
+
+      WidgetButton {
+        required property int modelData
+
+        readonly property var workspace: root.workspaceById(modelData)
+        readonly property bool occupied: workspace !== null && workspace.toplevels.values.length > 0
+        readonly property bool focused: Hyprland.focusedWorkspace !== null && Hyprland.focusedWorkspace.id === modelData
+
+        bar: root.bar
+        text: focused ? "\uDB85\uDCFB" : (modelData === 10 ? "0" : String(modelData))
+        opacity: occupied || focused ? 1 : 0.5
+        horizontalMargin: 6
+        verticalPadding: 6
+        fixedWidth: root.vertical ? root.barSize : Style.space(20)
+        fixedHeight: root.barSize
+        onPressed: function() { root.focusWorkspace(modelData) }
+      }
+    }
+  }
 
   RowLayout {
-    id: row
+    id: dualRow
+    visible: root.dual
     anchors.fill: parent
     anchors.rightMargin: root.trailingGap
     spacing: Style.space(1)
