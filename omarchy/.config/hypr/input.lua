@@ -11,6 +11,10 @@ hl.config({
     -- Mouse: keep the pre-Quattro feel.
     natural_scroll = true,
     sensitivity = -0.4,
+
+    touchpad = {
+      natural_scroll = true,
+    },
   },
 })
 
