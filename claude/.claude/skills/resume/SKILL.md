@@ -1,6 +1,6 @@
 ---
 name: resume
-description: Generate resume-ready accomplishments from all git history, weekly updates, and completed tasks.
+description: Generate resume-ready accomplishments from all git history and weekly updates.
 allowed-tools: Bash(*), Read, Write, Glob
 context: fork
 model: sonnet
@@ -12,14 +12,14 @@ Generate a resume-formatted markdown file from all historical work data.
 
 ## Steps
 
-**1. Gather data** -- Run all three of these in parallel as separate Bash calls:
+**1. Gather data** -- Run both of these in parallel as separate Bash calls:
 
 a) **All weekly updates** -- Glob for `~/Documents/Projects/weekly-updates/weekly-update-*.md`, then read every file. Extract all accomplishment bullets (lines under "Weekly accomplishments"). These are already polished -- they take priority over raw commit messages when deduplicating.
 
 b) **All git repos** -- Run in a single Bash call. This collects five things per repo: commit messages with dates, commit count, branch names (feature areas), project structure (technologies used), and total scope of changes.
 
 ```bash
-for repo in $(fd -H -t d -I "^\.git$" /Users/nasa68p/Documents/Projects/*-projects | sed 's|/.git||' | sort); do
+for repo in $(fd -H -t d -I "^\.git$" /Users/nasa68p/Documents/Projects/*-projects | sed 's|/.git/*$||' | sort); do
   count=$(git -C "$repo" log --all --author="salem.nassar@verizonwireless.com" --oneline 2>/dev/null | wc -l | tr -d ' ')
   [ "$count" = "0" ] && continue
   echo "=== $repo ==="
@@ -48,16 +48,14 @@ done
 After the repo loop, run a second Bash call to get the exact date range:
 
 ```bash
-for repo in $(fd -H -t d -I "^\.git$" /Users/nasa68p/Documents/Projects/*-projects | sed 's|/.git||' | sort); do
+for repo in $(fd -H -t d -I "^\.git$" /Users/nasa68p/Documents/Projects/*-projects | sed 's|/.git/*$||' | sort); do
   git -C "$repo" log --all --author="salem.nassar@verizonwireless.com" --pretty=format:"%ad" --date=short 2>/dev/null
 done | sort | sed -n '1p;$p'
 ```
 
 This outputs two lines: the earliest and latest commit dates. Use these exact dates for the "based on work from X to Y" line in the output. Do not infer or guess dates.
 
-c) **All completed tasks** -- `task status:completed export`
-
-**2. Deduplicate and merge** -- Weekly update bullets are pre-polished. Use them as the primary source. Fill in gaps with commit data and completed tasks that aren't already covered by a weekly update bullet. Do not include duplicate or near-duplicate entries.
+**2. Deduplicate and merge** -- Weekly update bullets are pre-polished. Use them as the primary source. Fill in gaps with commit data not already covered by a weekly update bullet. Do not include duplicate or near-duplicate entries.
 
 **3. Categorize by theme** -- Group accomplishments into thematic sections based on the nature of the work, NOT by repository. Choose from these categories (only include categories with content):
 
@@ -92,20 +90,20 @@ Only include skills with clear evidence in the data. Do not guess.
 ### Network Automation Engineer -- Verizon
 
 **Automation & Provisioning**
-- Bullet here
-- Bullet here
+* Bullet here
+* Bullet here
 
 **Infrastructure & Platform**
-- Bullet here
+* Bullet here
 
 **Integration & Tooling**
-- Bullet here
+* Bullet here
 
 **Security & Compliance**
-- Bullet here
+* Bullet here
 
 **Observability & Operations**
-- Bullet here
+* Bullet here
 
 ## Technical Skills
 

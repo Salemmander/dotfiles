@@ -6,7 +6,6 @@
   "permissions": {
     "allow": [
       "Read",
-      "Read(//**)",
       "Glob",
       "Grep",
       "WebFetch",
@@ -17,17 +16,31 @@
       "Bash(cat *)",
       "Bash(which *)",
       "Bash(echo *)",
-      "Skill(task)",
-      "Bash(task *)"
+      "Bash(grep *)",
+      "Bash(rg *)",
+      "Bash(find *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)",
+      "Bash(diff *)",
+      "Bash(glab issue view *)",
+      "Bash(glab issue list *)",
+      "Bash(glab mr view *)",
+      "Bash(glab mr list *)",
+      "Bash(glab mr diff *)",
+      "Bash(poetry run *)"
     ],
     "ask": [
-      "Bash(git*push*)",
       "Bash(git*reset --hard*)",
-      "Bash(git*clean -f*)",
-      "Bash(task*done*)",
-      "Bash(task*delete*)"
+      "Bash(git*clean -f*)"
     ],
-    "defaultMode": "default"
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push * main*)",
+      "Bash(git push * master*)"
+    ],
+    "defaultMode": "auto"
   },
   "model": "opus[1m]",
   "hooks": {
@@ -60,8 +73,7 @@
   "enabledPlugins": {
     "clangd-lsp@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
-    "lua-lsp@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true
+    "lua-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {

@@ -2,72 +2,37 @@
 name: commit
 model: haiku
 context: fork
-description: Stage, commit, and push changes. Drafts a commit message then commits and pushes with permission approval.
+description: Stage, commit, and push changes autonomously. Never pushes to main/master. Reports the commit message.
 allowed-tools: Bash(git *)
 ---
 
-## Invocation
+`/commit [path]` — `path` is an absolute path or a repo name under `~/Documents/Projects/`. If given, use `git -C <path>` for every command.
 
-`/commit [path]` — `path` can be an absolute path or a repo name. If a repo name is given, resolve it to a full path by searching under `~/Documents/Projects/`. Then prefix all git commands with `git -C <resolved-path>`.
+Run end to end without asking questions.
 
-## Safety Rules
+## Rules
 
-- NEVER use `git add -A` or `git add .` -- always stage specific files by name
-- NEVER use `--no-verify` or `--amend`
-- NEVER force push (`--force`, `--force-with-lease`)
-- NEVER push to `main` or `master` without explicitly warning the user first
-- Warn about files that look like secrets: `.env`, `credentials`, `*.key`, `*.pem`, `*.secret`, tokens, passwords
+- Stage files by name. Never `git add -A` / `git add .`
+- Never `--no-verify`, `--amend`, or force push
+- Skip anything that looks like a secret (`.env`, `credentials*`, `*.key`, `*.pem`, `*.secret`, tokens) — don't stage it
+- **Never push to `main` or `master`.** Commit locally and stop.
 
-## Instructions
+## Steps
 
-### Step 1: Review changes
+1. Run `git status`, `git diff HEAD`, `git log --oneline -5` in parallel. If nothing changed, say so and stop.
+2. Stage all changed files except secrets.
+3. Write the message from `git diff --cached`: imperative summary under 72 chars, optional body wrapped at 72, matching recent commit style.
+4. Commit with `git commit -m "Summary" -m "Body"`. Don't use a heredoc; it breaks permission matching.
+5. Check the branch with `git branch --show-current`. If it's `main` or `master`, skip the push. Otherwise run `git push`, or `git push -u origin <branch>` if there's no upstream.
 
-Run in parallel: `git status`, `git diff HEAD`, `git log --oneline -5`.
+## Report
 
-If there are no changes, tell the user and stop.
+Output only:
 
-If any files look like secrets (`.env`, `credentials.*`, `*.key`, `*.pem`, `*.secret`), warn the user and ask before continuing.
+```
+<commit message>
 
-### Step 2: Stage files
-
-Check what is already staged:
-
-```bash
-git diff --cached --name-only
+<short-hash> on <branch> — pushed | not pushed (main/master) | push failed: <reason>
 ```
 
-Then stage any remaining relevant files by name. If it's ambiguous which files to include, ask the user.
-
-### Step 3: Draft commit message
-
-Run `git diff --cached` and draft a commit message:
-
-- Summary: imperative mood, under 72 chars (e.g. "Add feature" not "Added feature")
-- Body: what changed and why, wrapped at 72 chars. Omit if the change is trivial.
-- Match the style of recent commits from Step 1.
-
-Do not pause or ask for confirmation — proceed straight to commit.
-
-### Step 4: Commit
-
-Use `-m` for the summary and a second `-m` for the body. Never use a heredoc — it breaks permission matching.
-
-```bash
-git commit -m "Summary line" -m "Body paragraph."
-```
-
-### Step 5: Push
-
-Check the branch and upstream:
-
-```bash
-git rev-parse --abbrev-ref @{upstream} 2>/dev/null
-```
-
-If on `main` or `master`, warn the user. The permission system will prompt for push approval — do NOT use AskUserQuestion.
-
-Push with `git push`, or `git push -u origin <branch>` if no upstream exists.
-
-### Step 6: Report
-
-Report back with: the commit message, commit hash, branch, and push status.
+Add one line listing any files skipped as secrets.

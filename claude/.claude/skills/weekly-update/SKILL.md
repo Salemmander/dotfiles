@@ -1,59 +1,35 @@
 ---
 name: weekly-update
-description: Generate a weekly status update from git commit history, weekly notes, and completed tasks.
+description: Generate a weekly status update from this week's git commits and weekly notes.
 disable-model-invocation: true
-allowed-tools: Bash(*), Read, Write, Edit("weekly-updates/*")
+allowed-tools: Bash(*), Read, Write
 context: fork
 model: sonnet
 ---
 
-# Weekly Update Generator
+All files live in `~/Documents/Projects/weekly-updates/`. Run end to end without asking questions.
 
 ## Steps
 
-**1. Date range** — Calculate Monday of current week through today:
+1. **Dates.** `monday=$(date -v-$(( $(date +%u) - 1 ))d +%Y-%m-%d)` and `end=$(date -v+1d +%Y-%m-%d)`.
+2. **Gather** (in parallel):
+   - The latest `weekly-update-*.md`, for last week's upcoming work.
+   - `weekly-notes.md`, if it exists. Notes take priority over commits. Don't modify it.
+   - This week's commits:
 
-```bash
-day_of_week=$(date +%u)
-monday_date=$(date -v-$((day_of_week - 1))d +%Y-%m-%d)
-end_date=$(date -v+1d +%Y-%m-%d)
-```
+     ```bash
+     for repo in $(fd -H -t d -I '^\.git$' ~/Documents/Projects/*-projects | sed 's|/.git/*$||' | sort); do
+       log=$(git -C "$repo" log --all --author=salem.nassar@verizonwireless.com --since="$monday" --until="$end" --pretty='%s%n%b')
+       [ -n "$log" ] && printf '=== %s ===\n%s\n' "$repo" "$log"
+     done
+     ```
 
-**2. Gather data** — Run all four of these in parallel as separate Bash calls:
+3. **Carry forward.** Last week's upcoming items move to accomplishments if the commits or notes show them done. Otherwise they stay upcoming.
+4. **Write** `weekly-update-<monday>.md`, overwriting if it exists.
 
-a) **Previous update** — `ls -1 /Users/nasa68p/Documents/Projects/weekly-updates/weekly-update-*.md | tail -1` then read it. Extract upcoming work items to carry forward.
+## Format
 
-b) **Weekly notes** — Read `weekly-updates/weekly-notes.md` if it exists. Notes take priority over commit data. Do not modify this file.
-
-c) **Completed tasks** — `task status:completed end.after:[monday_date] export`. Match to project sections by `project` field.
-
-d) **Collect commits** — Run in a single Bash call:
-
-```bash
-for repo in $(fd -H -t d -I "^\.git$" /Users/nasa68p/Documents/Projects/*-projects | sed 's|/.git||' | sort); do
-  commits=$(git -C "$repo" log --all --author="salem.nassar@verizonwireless.com" --since="[monday_date]" --until="[end_date]" --pretty=format:"COMMIT_START%n%s%n%b%nCOMMIT_END%n")
-  [ -z "$commits" ] && continue
-  echo "=== $repo ==="
-  echo "$commits"
-  git -C "$repo" log --all --author="salem.nassar@verizonwireless.com" --since="[monday_date]" --until="[end_date]" --stat --oneline
-  git -C "$repo" branch -a --sort=-committerdate | head -5
-done
-```
-
-**3. Carry forward upcoming work** — If commits/notes show it's done, move to accomplishments; if blocked/in-progress or no evidence, keep in upcoming. Do not ask the user.
-
-**4. Write the report** — Output to `weekly-updates/weekly-update-[monday_date].md`. Overwrite if it already exists. Tell the user it's ready and ask for changes.
-
-## Project grouping
-
-- `aspn-projects/` → ASPN
-- `nautobot-projects/` → Nautobot
-- `ufb-projects/` → Unified File Builder
-- `vault-projects/` → Vault
-
-Only include project sections that have activity (commits, notes, or completed tasks). Skip empty groups.
-
-## Output format
+One section per project group with activity: `aspn-projects` = ASPN, `nautobot-projects` = Nautobot, `ufb-projects` = Unified File Builder, `vault-projects` = Vault. Any other folder: use the repo name.
 
 ```
 **Salem Nassar - [Project]**
@@ -66,26 +42,16 @@ Only include project sections that have activity (commits, notes, or completed t
 
 ```
 
-Repeat for each project. Two blank lines between sections. No markdown headers. Use `*` for list markers (not `-`), two-space indentation for nested items.
+Two blank lines between sections. No headers. `*` markers, two-space indent.
 
-## Writing rules
+## Writing
 
-- Write for senior leadership -- outcomes, not technical details
-- One concise line per bullet, no over-explaining
-- No jargon: no file paths, function names, CLI commands, config file names
-- Merged to master: confident verbs (Built, Completed, Added, Fixed)
-- Feature branch only: cautious verbs (Started, Began)
-- Combine related commits into one bullet
-- Upcoming: carry forward from previous week + inferred from commits/notes; use `TODO: Fill in upcoming work` if nothing known
+- For senior leadership: outcomes, not technical details. One line per bullet.
+- No file paths, function names, commands, or config names.
+- Merged to master: confident verbs (Built, Completed, Fixed). Feature branch only: Started, Began.
+- Combine related commits. If nothing is known for upcoming, write `TODO: Fill in upcoming work`.
+- Example: "Migrated API key to X-API-Key header" becomes "Improved API security by updating credential handling".
 
-## Examples
+## Report
 
-BAD: "Migrated API key from URL query params to X-API-Key request header"
-GOOD: "Improved API security by updating credential handling"
-
-BAD: "Created Terraform modules and refactored .tf files"
-GOOD: "Started migrating Nautobot deployments to Terraform"
-
-## Wrap-up
-
-Confirm file path, number of repos/commits processed, and remind user to clear `weekly-notes.md`.
+File path, repos and commits counted, and a reminder to clear `weekly-notes.md`.
