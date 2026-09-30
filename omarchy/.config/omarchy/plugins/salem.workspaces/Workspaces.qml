@@ -57,84 +57,92 @@ BarWidget {
     onPressed: function() { root.focusWorkspace(workspaceId) }
   }
 
-  implicitWidth: (root.dual ? dualRow.implicitWidth : singleGrid.implicitWidth) + trailingGap
-  implicitHeight: root.dual ? dualRow.implicitHeight : singleGrid.implicitHeight
+  implicitWidth: layoutLoader.implicitWidth + trailingGap
+  implicitHeight: layoutLoader.implicitHeight
 
-  GridLayout {
-    id: singleGrid
-    visible: !root.dual
+  // Only build the active layout; each WidgetButton is costly to create.
+  Loader {
+    id: layoutLoader
     anchors.fill: parent
     anchors.rightMargin: root.trailingGap
-    columns: root.vertical ? 1 : root.workspaceIds().length
-    columnSpacing: root.vertical ? 0 : Style.space(1)
-    rowSpacing: root.vertical ? Style.space(2) : 0
+    sourceComponent: root.dual ? dualLayout : singleLayout
+  }
 
-    Repeater {
-      model: root.workspaceIds()
+  Component {
+    id: singleLayout
 
-      WidgetButton {
-        required property int modelData
+    GridLayout {
+      columns: root.vertical ? 1 : root.workspaceIds().length
+      columnSpacing: root.vertical ? 0 : Style.space(1)
+      rowSpacing: root.vertical ? Style.space(2) : 0
 
-        readonly property var workspace: root.workspaceById(modelData)
-        readonly property bool occupied: workspace !== null && workspace.toplevels.values.length > 0
-        readonly property bool focused: Hyprland.focusedWorkspace !== null && Hyprland.focusedWorkspace.id === modelData
+      Repeater {
+        model: root.workspaceIds()
 
-        bar: root.bar
-        text: focused ? "\uDB85\uDCFB" : (modelData === 10 ? "0" : String(modelData))
-        opacity: occupied || focused ? 1 : 0.5
-        horizontalMargin: 6
-        verticalPadding: 6
-        fixedWidth: root.vertical ? root.barSize : Style.space(20)
-        fixedHeight: root.barSize
-        onPressed: function() { root.focusWorkspace(modelData) }
+        WidgetButton {
+          required property int modelData
+
+          readonly property var workspace: root.workspaceById(modelData)
+          readonly property bool occupied: workspace !== null && workspace.toplevels.values.length > 0
+          readonly property bool focused: Hyprland.focusedWorkspace !== null && Hyprland.focusedWorkspace.id === modelData
+
+          bar: root.bar
+          text: focused ? "\uDB85\uDCFB" : (modelData === 10 ? "0" : String(modelData))
+          opacity: occupied || focused ? 1 : 0.5
+          horizontalMargin: 6
+          verticalPadding: 6
+          fixedWidth: root.vertical ? root.barSize : Style.space(20)
+          fixedHeight: root.barSize
+          onPressed: function() { root.focusWorkspace(modelData) }
+        }
       }
     }
   }
 
-  RowLayout {
-    id: dualRow
-    visible: root.dual
-    anchors.fill: parent
-    anchors.rightMargin: root.trailingGap
-    spacing: Style.space(1)
+  Component {
+    id: dualLayout
 
     RowLayout {
       spacing: Style.space(1)
-      opacity: root.leftActive ? 1 : 0.35
-      Behavior on opacity { NumberAnimation { duration: 140 } }
 
-      Repeater {
-        model: [6, 7, 8, 9, 10]
-        Slot {
-          required property int modelData
-          required property int index
-          workspaceId: modelData
-          label: index + 1
+      RowLayout {
+        spacing: Style.space(1)
+        opacity: root.leftActive ? 1 : 0.35
+        Behavior on opacity { NumberAnimation { duration: 140 } }
+
+        Repeater {
+          model: [6, 7, 8, 9, 10]
+          Slot {
+            required property int modelData
+            required property int index
+            workspaceId: modelData
+            label: index + 1
+          }
         }
       }
-    }
 
-    Text {
-      text: "│"
-      color: root.bar ? root.bar.barForeground : Color.foreground
-      font.family: root.bar ? root.bar.fontFamily : Style.font.family
-      font.pixelSize: Style.font.body
-      opacity: 0.35
-      Layout.leftMargin: Style.space(2)
-      Layout.rightMargin: Style.space(2)
-    }
+      Text {
+        text: "│"
+        color: root.bar ? root.bar.barForeground : Color.foreground
+        font.family: root.bar ? root.bar.fontFamily : Style.font.family
+        font.pixelSize: Style.font.body
+        opacity: 0.35
+        Layout.leftMargin: Style.space(2)
+        Layout.rightMargin: Style.space(2)
+      }
 
-    RowLayout {
-      spacing: Style.space(1)
-      opacity: root.rightActive ? 1 : 0.35
-      Behavior on opacity { NumberAnimation { duration: 140 } }
+      RowLayout {
+        spacing: Style.space(1)
+        opacity: root.rightActive ? 1 : 0.35
+        Behavior on opacity { NumberAnimation { duration: 140 } }
 
-      Repeater {
-        model: [1, 2, 3, 4, 5]
-        Slot {
-          required property int modelData
-          workspaceId: modelData
-          label: modelData
+        Repeater {
+          model: [1, 2, 3, 4, 5]
+          Slot {
+            required property int modelData
+            workspaceId: modelData
+            label: modelData
+          }
         }
       }
     }
