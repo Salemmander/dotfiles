@@ -1,10 +1,10 @@
 ---
 name: weekly-update
-description: Generate a weekly status update from this week's git commits and weekly notes.
+description: Generate a weekly status update from this week's git commits.
 disable-model-invocation: true
 allowed-tools: Bash(*), Read, Write
 context: fork
-model: sonnet
+model: haiku
 ---
 
 All files live in `~/Documents/Projects/weekly-updates/`. Run end to end without asking questions.
@@ -14,7 +14,6 @@ All files live in `~/Documents/Projects/weekly-updates/`. Run end to end without
 1. **Dates.** `monday=$(date -v-$(( $(date +%u) - 1 ))d +%Y-%m-%d)` and `end=$(date -v+1d +%Y-%m-%d)`.
 2. **Gather** (in parallel):
    - The latest `weekly-update-*.md`, for last week's upcoming work.
-   - `weekly-notes.md`, if it exists. Notes take priority over commits. Don't modify it.
    - This week's commits:
 
      ```bash
@@ -24,7 +23,7 @@ All files live in `~/Documents/Projects/weekly-updates/`. Run end to end without
      done
      ```
 
-3. **Carry forward.** Last week's upcoming items move to accomplishments if the commits or notes show them done. Otherwise they stay upcoming.
+3. **Carry forward.** Last week's upcoming items move to accomplishments if the commits show them done. Otherwise they stay upcoming.
 4. **Write** `weekly-update-<monday>.md`, overwriting if it exists.
 
 ## Format
@@ -54,4 +53,4 @@ Two blank lines between sections. No headers. `*` markers, two-space indent.
 
 ## Report
 
-File path, repos and commits counted, and a reminder to clear `weekly-notes.md`.
+File path, plus repos and commits counted.

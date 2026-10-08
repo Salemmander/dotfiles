@@ -11,15 +11,15 @@ Work autonomously. Stop and ask only if the issue is too vague to act on or the 
 ## Steps
 
 1. **Read.** `glab issue view <n> --comments`. Note the acceptance criteria and any linked MRs.
-2. **Branch + MR.** If there are uncommitted changes, stop and report them. If the current branch already starts with `<n>-`, stay on it and skip to step 3. Otherwise, create the remote branch and draft MR together, then check it out:
+2. **Branch + MR.** If there are uncommitted changes, stop and report them. If the current branch already matches `<type>/<n>-*`, stay on it and skip to step 3. Otherwise, create the remote branch and draft MR together, then check it out:
 
    ```bash
-   glab mr create -i <n> --create-source-branch -s <n>-<short-slug> --remove-source-branch --draft --yes
+   glab mr create -i <n> --create-source-branch -s <type>/<n>-<short-slug> --remove-source-branch --draft --yes
    git fetch origin
-   git switch <n>-<short-slug>
+   git switch <type>/<n>-<short-slug>
    ```
 
-   Slug: 2–4 lowercase words from the title, dash-separated.
+   Type: GitLab rejects branches not matching `(feature|bug|chore)/.*`. Use `bug` for defects, `chore` for refactors/cleanup/deps/CI, `feature` otherwise. Slug: 2–4 lowercase words from the title, dash-separated.
 3. **Implement.** Make the change. Keep scope to what the issue asks.
 4. **Verify.** Run the project's tests and linter. Fix failures you caused. If you can't get them passing, keep going but say so in the report.
 5. **Commit.** Use the `commit` skill. It pushes, because the branch isn't main/master, and the MR updates on its own.
