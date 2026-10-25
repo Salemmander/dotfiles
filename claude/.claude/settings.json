@@ -118,5 +118,6 @@
       "**Org-specific CLIs**: None configured — poetry, psql, and uv seen routinely in this project (dev/db tooling), not org-specific",
       "Routine under this repo's path: migrations must be generated inside the vaaf-containerized container, not locally (per CLAUDE.md/README)"
     ]
-  }
+  },
+  "feedbackDrafts": "off"
 }

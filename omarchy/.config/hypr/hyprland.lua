@@ -39,6 +39,10 @@ o.window("brave-nngceckbapebfimnlniiiahkandclblb-Default", {
   center = true,
 })
 
+-- Steam games (class steam_app_<id>): controller input doesn't reset the
+-- Wayland idle timer, and Omarchy's steam rule only matches the client itself.
+o.window("^steam_app_.*$", { idle_inhibit = "fullscreen" })
+
 -- Black Ops 3 under Proton/Wine: keep XWayland menu input reliable.
 o.window(".*[Bb]lack.*[Oo]ps.*3.*", {
   allows_input = true,
@@ -70,3 +74,7 @@ o.window({ class = "^zoom$", title = "^(annotate_toolbar|as_toolbar)$" }, {
   size = { 900, 80 },
 })
 o.window("zoom", { no_anim = true })
+
+-- Tile the main Steam window (Omarchy floats all of Steam). Dialogs and
+-- Friends List keep floating.
+o.window({ class = "^steam$", title = "^Steam$" }, { tile = true })
