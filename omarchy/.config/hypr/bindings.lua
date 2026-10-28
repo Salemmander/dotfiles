@@ -26,7 +26,7 @@
 -- Super+Shift+A was ChatGPT; Super+Shift+Alt+A was Grok.
 hl.unbind("SUPER + SHIFT + A")
 hl.unbind("SUPER + SHIFT + ALT + A")
-o.bind("SUPER + SHIFT + A", "Grok", { webapp = "https://grok.com" })
+o.bind("SUPER + SHIFT + A", "Grok Bot", { launch = "grok-bot" })
 
 -- Super+Shift+E was Hey email.
 hl.unbind("SUPER + SHIFT + E")
