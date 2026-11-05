@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Io
 import qs.Commons
 import qs.Ui
 
@@ -8,11 +10,71 @@ BarWidget {
   id: root
   moduleName: "omarchy.workspaces"
 
-  readonly property bool dual: Hyprland.monitors && Hyprland.monitors.values.length >= 2
+  // Omarchy 4.5 gives each monitor a block of ten workspaces (1-10, 11-20, ...)
+  // and records connector -> block in ~/.local/state/omarchy/monitor-workspaces.
+  readonly property int slots: 10
+  property var blocks: ({})
+
+  function readBlocks(text) {
+    var next = {}
+    var lines = String(text || "").split("\n")
+    for (var i = 0; i < lines.length; i++) {
+      var fields = lines[i].split("\t")
+      if (fields.length >= 3 && fields[1] !== "") next[fields[1]] = parseInt(fields[0], 10)
+    }
+    root.blocks = next
+  }
+
+  FileView {
+    path: (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state") + "/omarchy/monitor-workspaces"
+    watchChanges: true
+    printErrors: false
+    onFileChanged: reload()
+    onLoaded: root.readBlocks(text())
+    onLoadFailed: root.readBlocks("")
+  }
+
+  function blockOf(id) {
+    return Math.floor((id - 1) / root.slots)
+  }
+
+  function slotOf(id) {
+    return (id - 1) % root.slots + 1
+  }
+
+  function monitorBlock(monitor) {
+    if (!monitor) return 0
+    var block = root.blocks[monitor.name]
+    if (block !== undefined) return block
+    var active = root.activeIdOf(monitor)
+    return active > 0 ? root.blockOf(active) : 0
+  }
+
+  // Monitors ordered left to right on the desk.
+  readonly property var sortedMonitors: {
+    var list = Hyprland.monitors ? Hyprland.monitors.values.slice() : []
+    list.sort(function(a, b) { return a.x - b.x })
+    return list
+  }
+  readonly property bool dual: sortedMonitors.length >= 2
+  readonly property var leftMonitor: dual ? sortedMonitors[0] : null
+  readonly property var rightMonitor: dual ? sortedMonitors[sortedMonitors.length - 1] : null
+  readonly property int leftBase: root.monitorBlock(leftMonitor) * root.slots
+  readonly property int rightBase: root.monitorBlock(rightMonitor) * root.slots
+
   readonly property int focusedId: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 0
-  readonly property bool leftActive: focusedId >= 6
-  readonly property bool rightActive: focusedId >= 1 && focusedId <= 5
+  readonly property bool leftActive: dual && root.blockOf(focusedId) === root.monitorBlock(leftMonitor)
+  readonly property bool rightActive: dual && root.blockOf(focusedId) === root.monitorBlock(rightMonitor)
   readonly property real trailingGap: root.vertical ? 0 : Style.spaceReal(1.5)
+
+  // Quickshell's monitor.activeWorkspace can go stale across monitors, so read
+  // the id from Hyprland's own monitor JSON, refreshed on every workspace event.
+  function activeIdOf(monitor) {
+    if (!monitor) return -1
+    var ipc = monitor.lastIpcObject
+    if (ipc && ipc.activeWorkspace && ipc.activeWorkspace.id !== undefined) return ipc.activeWorkspace.id
+    return monitor.activeWorkspace ? monitor.activeWorkspace.id : -1
+  }
 
   function workspaceById(id) {
     var values = Hyprland.workspaces.values
@@ -22,39 +84,65 @@ BarWidget {
     return null
   }
 
-  function workspaceIds() {
-    var ids = [1, 2, 3, 4, 5]
+  // The first five of a monitor's block, plus any others in it that exist.
+  function blockIds(base) {
+    var block = root.blockOf(base + 1)
+    var ids = [base + 1, base + 2, base + 3, base + 4, base + 5]
     var values = Hyprland.workspaces.values
     for (var i = 0; i < values.length; i++) {
       var id = values[i].id
-      if (id > 0 && id <= 10 && ids.indexOf(id) === -1) ids.push(id)
+      if (id > 0 && root.blockOf(id) === block && ids.indexOf(id) === -1) ids.push(id)
     }
     ids.sort(function(left, right) { return left - right })
     return ids
   }
 
-  function focusWorkspace(id) {
+  function workspaceIds() {
+    return root.blockIds(root.monitorBlock(Hyprland.focusedMonitor) * root.slots)
+  }
+
+  function focusWorkspace(id, monitor) {
     if (!root.bar) return
-    root.bar.run("hyprctl dispatch " + Util.shellQuote("hl.dsp.focus({ workspace = \"" + id + "\" })"))
+    var expression = monitor
+      ? "o.workspaces.focus(" + root.slotOf(id) + ", \"" + monitor.name + "\")"
+      : "o.workspaces.focus(" + root.slotOf(id) + ")"
+    root.bar.run("hyprctl dispatch " + Util.shellQuote(expression))
+  }
+
+  // Quickshell credits workspace switches to the focused monitor, so ask
+  // Hyprland for the truth when workspaces move or renumber.
+  Component.onCompleted: {
+    Hyprland.refreshMonitors()
+    Hyprland.refreshWorkspaces()
+  }
+
+  Connections {
+    target: Hyprland
+    function onRawEvent(event) {
+      var name = event ? String(event.name) : ""
+      if (name === "workspacev2" || name === "moveworkspacev2" || name === "changeworkspaceid") {
+        Hyprland.refreshMonitors()
+        Hyprland.refreshWorkspaces()
+      }
+    }
   }
 
   component Slot: WidgetButton {
     required property int workspaceId
-    required property int label
+    required property var monitor
 
     readonly property var workspace: root.workspaceById(workspaceId)
     readonly property bool occupied: workspace !== null && workspace.toplevels.values.length > 0
-    readonly property bool focused: workspace && workspace.monitor && workspace.monitor.activeWorkspace
-      && workspace.monitor.activeWorkspace.id === workspaceId
+    readonly property bool focused: root.activeIdOf(monitor) === workspaceId
 
     bar: root.bar
-    text: focused ? "\uDB85\uDCFB" : String(label)
+    text: focused ? "\uDB85\uDCFB" : (root.slotOf(workspaceId) === root.slots ? "0" : String(root.slotOf(workspaceId)))
     opacity: occupied || focused ? 1 : 0.5
     horizontalMargin: 6
     verticalPadding: 6
     fixedWidth: root.vertical ? root.barSize : Style.space(20)
     fixedHeight: root.barSize
-    onPressed: function() { root.focusWorkspace(workspaceId) }
+    onPressed: function() { root.focusWorkspace(workspaceId, monitor) }
   }
 
   implicitWidth: layoutLoader.implicitWidth + trailingGap
@@ -87,7 +175,7 @@ BarWidget {
           readonly property bool focused: Hyprland.focusedWorkspace !== null && Hyprland.focusedWorkspace.id === modelData
 
           bar: root.bar
-          text: focused ? "\uDB85\uDCFB" : (modelData === 10 ? "0" : String(modelData))
+          text: focused ? "\uDB85\uDCFB" : (root.slotOf(modelData) === root.slots ? "0" : String(root.slotOf(modelData)))
           opacity: occupied || focused ? 1 : 0.5
           horizontalMargin: 6
           verticalPadding: 6
@@ -111,12 +199,11 @@ BarWidget {
         Behavior on opacity { NumberAnimation { duration: 140 } }
 
         Repeater {
-          model: [6, 7, 8, 9, 10]
+          model: root.blockIds(root.leftBase)
           Slot {
             required property int modelData
-            required property int index
             workspaceId: modelData
-            label: index + 1
+            monitor: root.leftMonitor
           }
         }
       }
@@ -137,11 +224,11 @@ BarWidget {
         Behavior on opacity { NumberAnimation { duration: 140 } }
 
         Repeater {
-          model: [1, 2, 3, 4, 5]
+          model: root.blockIds(root.rightBase)
           Slot {
             required property int modelData
             workspaceId: modelData
-            label: modelData
+            monitor: root.rightMonitor
           }
         }
       }
