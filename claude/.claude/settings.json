@@ -28,17 +28,26 @@
       "Bash(glab mr view *)",
       "Bash(glab mr list *)",
       "Bash(glab mr diff *)",
+      "Bash(gh issue view *)",
+      "Bash(gh issue list *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr diff *)",
       "Bash(poetry run *)"
     ],
     "deny": [
       "Bash(git push --force*)",
       "Bash(git push -f*)",
       "Bash(git push * main*)",
-      "Bash(git push * master*)"
+      "Bash(git push * master*)",
+      "Bash(git -C * push --force*)",
+      "Bash(git -C * push -f*)",
+      "Bash(git -C * push * main*)",
+      "Bash(git -C * push * master*)"
     ],
     "ask": [
       "Bash(git*reset --hard*)",
-      "Bash(git*clean -f*)"
+      "Bash(git*clean -*f*)"
     ],
     "defaultMode": "auto"
   },

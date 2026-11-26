@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Capture recent output from the active tmux pane and paste it into the agent pane.
+set -euo pipefail
+
+[ -n "${TMUX:-}" ] || exit 0
+
+current_pane=$(tmux display-message -p '#{pane_id}')
+target_pane=""
+fallback_pane=""
+
+while IFS=' ' read -r pid pindex pcmd; do
+	[ "$pid" = "$current_pane" ] && continue
+	case "$pcmd" in
+	agy | antigravity | claude | codex | grok | [0-9]*.[0-9]*)
+		target_pane="$pid"
+		break
+		;;
+	esac
+	if [ "$pindex" = "1" ] || [ -z "$fallback_pane" ]; then
+		fallback_pane="$pid"
+	fi
+done < <(tmux list-panes -F '#{pane_id} #{pane_index} #{pane_current_command}')
+
+target_pane="${target_pane:-$fallback_pane}"
+if [ -z "$target_pane" ]; then
+	tmux display-message "No other pane found for agent"
+	exit 0
+fi
+
+# Grab last ~50 lines, stripping trailing blank lines
+captured=$(tmux capture-pane -p -S -60 | sed -e :a -e '/^[[:space:]]*$/{$d;N;ba' -e '}' | tail -n 50)
+if [ -z "$captured" ]; then
+	tmux display-message "Pane output is empty"
+	exit 0
+fi
+
+printf 'Terminal output:\n```\n%s\n```\n' "$captured" | tmux load-buffer -b tmux_agent -
+tmux paste-buffer -b tmux_agent -t "$target_pane" -d -p
+tmux select-pane -t "$target_pane"

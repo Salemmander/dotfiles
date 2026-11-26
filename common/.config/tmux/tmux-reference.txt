@@ -11,6 +11,7 @@ Prefix-free (direct):
   Alt+n            new window
   Alt+w            close pane
   Alt+f            toggle pane zoom (fullscreen)
+  Alt+e            send last 50 lines of pane to agent pane
   Alt+/            show this reference
 
 Prefix (Ctrl+a, then key):

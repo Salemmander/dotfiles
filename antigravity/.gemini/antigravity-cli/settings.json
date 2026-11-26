@@ -1,0 +1,52 @@
+{
+  "model": "Gemini 4 Neon (High)",
+  "trustedWorkspaces": [
+    "/home/salem",
+    "/home/salem/dotfiles"
+  ],
+  "$schema": "https://antigravity.google/schemas/v1/settings.json",
+  "agentMode": "auto",
+  "permissions": {
+    "allow": [
+      "command(git)",
+      "command(date)",
+      "command(ls)",
+      "command(cat)",
+      "command(which)",
+      "command(echo)",
+      "command(grep)",
+      "command(rg)",
+      "command(find)",
+      "command(head)",
+      "command(tail)",
+      "command(wc)",
+      "command(diff)",
+      "command(glab issue view)",
+      "command(glab issue list)",
+      "command(glab mr view)",
+      "command(glab mr list)",
+      "command(glab mr diff)",
+      "command(gh issue view)",
+      "command(gh issue list)",
+      "command(gh pr view)",
+      "command(gh pr list)",
+      "command(gh pr diff)",
+      "command(poetry run)"
+    ],
+    "deny": [
+      "command(regex:^git(\\s+-[cC]\\s+\\S+)*\\s+push\\b.*(--force|-f\\b))",
+      "command(regex:^git(\\s+-[cC]\\s+\\S+)*\\s+push\\b.*\\b(main|master)\\b)"
+    ],
+    "ask": [
+      "command(regex:^git(\\s+-[cC]\\s+\\S+)*\\s+reset\\s+--hard\\b)",
+      "command(regex:^git(\\s+-[cC]\\s+\\S+)*\\s+clean\\s+-[a-zA-Z]*f)"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.gemini/antigravity-cli/statusline.sh",
+    "enabled": true,
+    "padding": 0,
+    "stack_with_default": true
+  }
+}

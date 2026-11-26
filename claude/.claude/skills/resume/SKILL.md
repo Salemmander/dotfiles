@@ -19,7 +19,7 @@ a) **All weekly updates** -- Glob for `~/Documents/Projects/weekly-updates/weekl
 b) **All git repos** -- Run in a single Bash call. This collects five things per repo: commit messages with dates, commit count, branch names (feature areas), project structure (technologies used), and total scope of changes.
 
 ```bash
-for repo in $(fd -H -t d -I "^\.git$" /Users/nasa68p/Documents/Projects/*-projects | sed 's|/.git/*$||' | sort); do
+for repo in $(fd -H -t d -I "^\.git$" ~/Documents/Projects/*-projects | sed 's|/.git/*$||' | sort); do
   count=$(git -C "$repo" log --all --author="salem.nassar@verizonwireless.com" --oneline 2>/dev/null | wc -l | tr -d ' ')
   [ "$count" = "0" ] && continue
   echo "=== $repo ==="
@@ -48,7 +48,7 @@ done
 After the repo loop, run a second Bash call to get the exact date range:
 
 ```bash
-for repo in $(fd -H -t d -I "^\.git$" /Users/nasa68p/Documents/Projects/*-projects | sed 's|/.git/*$||' | sort); do
+for repo in $(fd -H -t d -I "^\.git$" ~/Documents/Projects/*-projects | sed 's|/.git/*$||' | sort); do
   git -C "$repo" log --all --author="salem.nassar@verizonwireless.com" --pretty=format:"%ad" --date=short 2>/dev/null
 done | sort | sed -n '1p;$p'
 ```
