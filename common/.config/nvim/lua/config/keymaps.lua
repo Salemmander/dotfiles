@@ -48,8 +48,7 @@ local function find_agent_pane()
   return fallback
 end
 
-local function send_to_agent(text, opts)
-  opts = opts or {}
+local function send_to_agent(text)
   local target = find_agent_pane()
   if not target then
     return
@@ -66,10 +65,7 @@ local function send_to_agent(text, opts)
     table.insert(paste_cmd, "-p")
   end
   vim.system(paste_cmd):wait()
-
-  if opts.focus ~= false then
-    vim.system({ "tmux", "select-pane", "-t", target }):wait()
-  end
+  vim.system({ "tmux", "select-pane", "-t", target }):wait()
 end
 
 local function rel_path()
@@ -81,34 +77,23 @@ local function rel_path()
   return path
 end
 
-local function visual_range()
+local function send_visual_ref()
+  local path = rel_path()
+  if not path then
+    return
+  end
   local start_line = vim.fn.line("v")
   local end_line = vim.fn.line(".")
   if start_line > end_line then
     start_line, end_line = end_line, start_line
   end
-  return start_line, end_line
-end
 
-local function send_visual_ref(include_code)
-  local path = rel_path()
-  if not path then
-    return
-  end
-  local s, e = visual_range()
   local esc = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
   vim.api.nvim_feedkeys(esc, "nx", false)
 
-  local ref = s == e and string.format("@%s:%d ", path, s) or string.format("@%s:%d-%d ", path, s, e)
-  if not include_code then
-    send_to_agent(ref)
-    return
-  end
-
-  local lines = vim.api.nvim_buf_get_lines(0, s - 1, e, false)
-  local ft = vim.bo.filetype or ""
-  local payload = string.format("%s\n```%s\n%s\n```\n", vim.trim(ref), ft, table.concat(lines, "\n"))
-  send_to_agent(payload)
+  local ref = start_line == end_line and string.format("@%s:%d ", path, start_line)
+    or string.format("@%s:%d-%d ", path, start_line, end_line)
+  send_to_agent(ref)
 end
 
 local function send_diagnostics()
@@ -159,21 +144,6 @@ vim.keymap.set("n", "<leader>al", function()
   end
 end, { desc = "Send File:Line to Agent" })
 
-vim.keymap.set("v", "<leader>as", function()
-  send_visual_ref(false)
-end, { desc = "Send Selection Ref to Agent" })
-
-vim.keymap.set("v", "<leader>ac", function()
-  send_visual_ref(true)
-end, { desc = "Send Selection + Code to Agent" })
+vim.keymap.set("v", "<leader>as", send_visual_ref, { desc = "Send Selection Ref to Agent" })
 
 vim.keymap.set("n", "<leader>ad", send_diagnostics, { desc = "Send Diagnostics to Agent" })
-
-vim.keymap.set("n", "<leader>aa", function()
-  local target = find_agent_pane()
-  if target then
-    vim.system({ "tmux", "select-pane", "-t", target }):wait()
-  end
-end, { desc = "Focus Agent Pane" })
-
-vim.keymap.set("n", "<leader>ar", "<cmd>checktime<cr>", { desc = "Reload Buffers from Disk" })
