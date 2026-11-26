@@ -21,8 +21,6 @@ end
 
 -- Super+L was toggle workspace layout (dwindle/scrolling).
 hl.unbind("SUPER + L")
-hl.unbind("SUPER + GRAVE")
-hl.unbind("SUPER + SHIFT + GRAVE")
 
 o.bind("SUPER + H", "Focus left monitor", function()
   hl.dispatch(hl.dsp.focus({ monitor = "l" }))

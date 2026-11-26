@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md / CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI coding agents (Antigravity CLI, Claude Code) when working with code in this repository.
 
 ## Repository Overview
 
@@ -8,9 +8,13 @@ This is a personal dotfiles repository managed with GNU Stow. Configuration file
 
 ## Structure
 
-- `common/` - Cross-platform configs (zsh, nvim, tmux, starship)
+- `common/` - Cross-platform configs (zsh, nvim, tmux, starship, `.local/bin/` helpers)
 - `mac/` - macOS-specific configs (ghostty terminal, nvim theme)
 - `omarchy/` - Omarchy/Hyprland user overrides (Linux)
+- `pc/` - Dual-monitor Acer PC Hyprland overrides
+- `claude/` - Claude Code global config, hooks, and skills (`~/.claude/`)
+- `antigravity/` - Antigravity CLI global config, hooks, and skills (`~/.gemini/`)
+- `KEYBINDS.md` - Quick reference for Neovim/tmux/agy keybinds and skills
 
 ## Stow Usage
 
